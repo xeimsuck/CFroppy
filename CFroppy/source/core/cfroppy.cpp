@@ -23,17 +23,15 @@ cfroppy &cfroppy::init() {
  */
 int cfroppy::run(const int argc, char **argv) {
     if(argc>2) {
-        std::cout << "Usage: cfp [script]";
+        reporter.message("Usage: cfp [script]", true);
         return 1;
     }
     try {
-        if(argc==1) prompt();
-        else executeFile(argv[1]);
+        return argc == 1 ? prompt() : executeFile(argv[1]);
     } catch (const std::exception& ex) {
         std::cerr << ex.what();
         return 1;
     }
-    return 0;
 }
 
 
@@ -42,12 +40,13 @@ int cfroppy::run(const int argc, char **argv) {
  * @brief execute commands
  * @param source froppy source
  */
-void cfroppy::execute(const std::string &source) {
-    scanner scanner(source);
-    auto tokens = scanner.scanTokens();
+int cfroppy::execute(const std::string &source) {
+    scanner scanner(source, reporter);
+    decltype(auto) tokens = scanner.getTokens();
     for (auto& token : tokens) {
 
     }
+    return reporter.getHadError()?1:0;
 }
 
 
@@ -56,10 +55,11 @@ void cfroppy::execute(const std::string &source) {
  * @brief execute commands from script
  * @param path path to script
  */
-void cfroppy::executeFile(const std::string &path) {
+int cfroppy::executeFile(const std::string &path) {
     std::ifstream file(path);
     if(!file) {
-        throw std::runtime_error(std::format("couldn't open the file {}", path));
+        io.message(std::format("couldn't open the file {}", path), true);
+        return 1;
     }
 
     std::string source, line;
@@ -67,8 +67,7 @@ void cfroppy::executeFile(const std::string &path) {
         if(!source.empty()) source.push_back('\n');
         source+=line;
     }
-    execute(source);
-    file.close();
+    return execute(source);;
 }
 
 
@@ -76,11 +75,13 @@ void cfroppy::executeFile(const std::string &path) {
 /*!
  * @brief execute commands interactively
  */
-void cfroppy::prompt() {
-    std::string line="start";
+int cfroppy::prompt() {
+    std::string line="\n";
     while (!line.empty()) {
         std::cout << "> ";
         std::getline(std::cin, line);
         execute(line);
+        reporter.resetHadError();
     }
+    return 0;
 }

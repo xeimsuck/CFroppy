@@ -1,6 +1,6 @@
 #pragma once
-
 #include <string>
+#include "../io/reporter.hpp"
 
 namespace cfp {
     class cfroppy {
@@ -16,8 +16,11 @@ namespace cfp {
     private:
         cfroppy() = default;
 
-        void execute(const std::string &source);
-        void executeFile(const std::string &path);
-        void prompt();
+        int execute(const std::string &source);
+        int executeFile(const std::string &path);
+        int prompt();
+
+    private:
+        cpf::reporter reporter;
     };
 }
