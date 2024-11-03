@@ -211,7 +211,7 @@ void scanner::string() {
 
     // Add token
     auto value = source.substr(start+1, current-start-2);
-    addToken(STRING, type::string(std::move(value)));
+    addToken(STRING, literal(std::move(value)));
 }
 
 
@@ -232,8 +232,8 @@ void scanner::number() {
 
     // add token
     const auto value = source.substr(start, current-start);
-    if(isFractional) addToken(NUMBER, type::number(std::stod(value)));
-    else addToken(NUMBER, type::number(std::stoll(value)));
+    if(isFractional) addToken(NUMBER, literal(std::stod(value)));
+    else addToken(NUMBER, literal(std::stoll(value)));
 }
 
 
