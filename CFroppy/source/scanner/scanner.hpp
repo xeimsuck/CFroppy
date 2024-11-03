@@ -15,8 +15,8 @@ namespace cfp {
         [[nodiscard]] bool isAtEnd() const;
 
         char advance();
-        [[nodiscard]] bool match(char expected) const;
-        bool advanceIfMatch(char expected);
+        char peek() const;
+        bool match(char expected);
 
     private:
         const cpf::reporter& reporter;

@@ -64,6 +64,13 @@ void scanner::scanToken() {
         case '>':
             addToken(match('=') ? GREATER_EQUAL : GREATER);
             break;
+        case '/':
+            if(match('/')) {
+                while (!isAtEnd() && peek()!='\n') advance();
+            } else {
+                addToken(SLASH);
+            }
+            break;
         default: reporter.error(line, std::format("Unexpected character \'{}\'", ch)); break;
     }
 }
@@ -99,23 +106,21 @@ char scanner::advance() {
 
 
 /*!
- * @param expected expected character
- * @return true if expected equal a current character
- */
-bool scanner::match(const char expected) const{
-    if(isAtEnd()) return false;
-    return source[current] == expected;
-}
-
-/*!
  * @brief advance if match return true
  * @param expected expected character
  * @return true if expected equal a current character
  */
-bool scanner::advanceIfMatch(const char expected) {
-    if(!match(expected)) return false;
+bool scanner::match(const char expected) {
+    if(isAtEnd()&&source[current]!=expected) return false;
     ++current;
     return true;
 }
 
+
+/*!
+ * @return current character or null terminator if it is at end
+ */
+char scanner::peek() const {
+    return isAtEnd()?'\0':source[current];
+}
 
