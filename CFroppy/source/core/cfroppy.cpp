@@ -58,7 +58,7 @@ int cfroppy::execute(const std::string &source) {
 int cfroppy::executeFile(const std::string &path) {
     std::ifstream file(path);
     if(!file) {
-        io.message(std::format("couldn't open the file {}", path), true);
+        reporter.message(std::format("couldn't open the file {}", path), true);
         return 1;
     }
 
