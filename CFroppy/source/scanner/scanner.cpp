@@ -6,6 +6,25 @@
 using namespace cfp;
 using enum token::tokenType;
 
+static std::unordered_map<std::string, token::tokenType> keywords{
+    {"and",    AND},
+    {"class",  CLASS},
+    {"else",   ELSE},
+    {"false",  FALSE},
+    {"for",    FOR},
+    {"fun",    FUN},
+    {"if",     IF},
+    {"nil",    NIL},
+    {"or",     OR},
+    {"print",  PRINT},
+    {"return", RETURN},
+    {"super",  SUPER},
+    {"this",   THIS},
+    {"true",   TRUE},
+    {"var",    VAR},
+    {"while",  WHILE}
+};
+
 /*!
  * @brief just constructor
  * @param source froppy commands
@@ -71,7 +90,16 @@ void scanner::scanToken() {
                 addToken(SLASH);
             }
             break;
-        default: reporter.error(line, std::format("Unexpected character \'{}\'", ch)); break;
+        case ' ':
+        case '\t':
+        case '\r': break;
+        case '\n': ++line; break;
+        case '\"': string(); break;
+        default:
+            if(isDigit(ch)) number();
+            else if(isAlpha(ch)) identifier();
+            else reporter.error(line, std::format("Unexpected character \'{}\'", ch));
+            break;
     }
 }
 
@@ -124,3 +152,99 @@ char scanner::peek() const {
     return isAtEnd()?'\0':source[current];
 }
 
+
+/*!
+ * @return next character or null terminator if it is at end
+ */
+char scanner::peekNext() const {
+    if(current+1>=source.size()) return '\0';
+    return source[current+1];
+}
+
+
+
+/*!
+ * @brief digits are 0-9
+ * @return true if ch is digit
+ */
+bool scanner::isDigit(const char ch) {
+    return std::isdigit(ch);
+}
+
+
+
+/*!
+ * @return true if ch is digit ur alphabetic
+ */
+bool scanner::isAlphaNumber(const char ch) {
+    return isDigit(ch) || isAlpha(ch);
+}
+
+
+
+/*!
+ * @brief alphabetic characters are uppercase/lowercase english letters and '_'
+ * @return true if ch is alphabetic character
+ */
+bool scanner::isAlpha(const char ch) {
+    return std::isalpha(ch)||ch=='_';
+}
+
+
+
+/*!
+ * @brief add string literal token
+ */
+void scanner::string() {
+    while (!isAtEnd() && peek()!='\"') {
+        if(peek()=='\n') ++line;
+        advance();
+    }
+
+    if(isAtEnd()) {
+        reporter.error(line, "Unterminated string");
+        return;
+    }
+
+    // Closing "
+    advance();
+
+    // Add token
+    auto value = source.substr(start+1, current-start-2);
+    addToken(STRING, type::string(std::move(value)));
+}
+
+
+
+/*!
+ * @brief add number literal token
+ */
+void scanner::number() {
+    while (std::isdigit(peek())) advance();
+
+    // Fractional part
+    bool isFractional = false;
+    if(peek()=='.'&&std::isdigit(peekNext())) {
+        isFractional = true;
+        advance();
+        while (std::isdigit(peek())) advance();
+    }
+
+    // add token
+    const auto value = source.substr(start, current-start);
+    if(isFractional) addToken(NUMBER, type::number(std::stod(value)));
+    else addToken(NUMBER, type::number(std::stoll(value)));
+}
+
+
+/*!
+ * @brief add identifier token
+ */
+void scanner::identifier() {
+    while (isAlphaNumber(peek())) advance();
+
+    // add token
+    const auto word = source.substr(start, current-start);
+    const auto type = keywords.contains(word) ? keywords[word] : IDENTIFIER;
+    addToken(type);
+}

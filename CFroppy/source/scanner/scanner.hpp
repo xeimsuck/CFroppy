@@ -15,8 +15,17 @@ namespace cfp {
         [[nodiscard]] bool isAtEnd() const;
 
         char advance();
-        char peek() const;
+        [[nodiscard]] char peek() const;
+        [[nodiscard]] char peekNext() const;
         bool match(char expected);
+
+        static bool isDigit(char ch);
+        static bool isAlpha(char ch);
+        static bool isAlphaNumber(char ch);
+
+        void string();
+        void number();
+        void identifier();
 
     private:
         const cpf::reporter& reporter;
