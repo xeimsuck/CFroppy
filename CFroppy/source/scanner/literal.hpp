@@ -16,16 +16,16 @@ namespace cfp {
         };
     }
     struct literal {
-        explicit literal(const type::nil val = {}) {
+        literal(const type::nil val = {}) {
             value = val;
         }
-        explicit literal(const type::number& val) {
+        literal(const type::number& val) {
             value = val;
         }
-        explicit literal(const type::boolean val) {
+        literal(const type::boolean val) {
             value = val;
         }
-        explicit literal(const type::string& val) {
+        literal(const type::string& val) {
             value = val;
         }
         std::variant<type::nil, type::number, type::string, type::boolean> value;
