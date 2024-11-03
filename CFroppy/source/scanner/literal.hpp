@@ -4,6 +4,12 @@
 namespace cfp {
     namespace type {
         struct number {
+            explicit number(long long val=0) {
+                value = val;
+            }
+            explicit number(double val) {
+                value = val;
+            }
             std::variant<long long, double> value;
         };
         struct string {
