@@ -28,7 +28,7 @@ namespace cfp {
 
         tokenType type;
         std::string lexeme;
-        std::optional<literal> literal;
+        std::optional<cfp::literal> literal;
         int line;
 
         token(tokenType type, std::string lexeme, std::optional<cfp::literal> literal, int line);
