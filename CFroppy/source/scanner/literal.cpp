@@ -1,8 +1,8 @@
 #include "literal.hpp"
 
 using namespace cfp;
-using namespace cfp::scanner;
-using namespace cfp::scanner::types;
+using namespace cfp::scan;
+using namespace cfp::scan::types;
 
 literal::literal(boolean val) {
     value = val;

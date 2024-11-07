@@ -5,7 +5,7 @@
 
 using namespace cfp;
 using namespace cfp::core;
-using namespace cfp::scanner;
+using namespace cfp::scan;
 
 /*!
  * @return Singleton froppy
@@ -43,7 +43,7 @@ int cfroppy::run(const int argc, char **argv) {
  * @param source froppy source
  */
 int cfroppy::execute(const std::string &source) {
-    scanner::scanner scanner(source, reporter);
+    scan::scanner scanner(source, reporter);
     decltype(auto) tokens = scanner.getTokens();
     for (auto& token : tokens) {
 

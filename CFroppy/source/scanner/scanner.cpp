@@ -4,10 +4,10 @@
 #include <unordered_set>
 
 using namespace cfp;
-using namespace cfp::scanner;
-using enum cfp::scanner::token::tokenType;
+using namespace cfp::scan;
+using enum token::tokenType;
 
-static std::unordered_map<std::string, cfp::scanner::token::tokenType> keywords{
+static std::unordered_map<std::string, token::tokenType> keywords{
     {"and",    AND},
     {"class",  CLASS},
     {"else",   ELSE},
@@ -31,7 +31,7 @@ static std::unordered_map<std::string, cfp::scanner::token::tokenType> keywords{
  * @param source froppy commands
  * @param reporter reference to reporter object
  */
-cfp::scanner::scanner::scanner(std::string source, const io::reporter& reporter)
+cfp::scan::scanner::scanner(std::string source, const io::reporter& reporter)
                     : source(std::move(source)), reporter(reporter){
 }
 
@@ -41,14 +41,14 @@ cfp::scanner::scanner::scanner(std::string source, const io::reporter& reporter)
  * @brief scan source file and return tokens
  * @return all tokens
  */
-const std::vector<token>& cfp::scanner::scanner::getTokens() {
+const std::vector<token>& scanner::getTokens() {
     if(!tokens.empty()) return tokens;
 
     while(!isAtEnd()) {
         scanToken();
         start = current;
     }
-    tokens.emplace_back(token::tokenType::END_OF_FILE, "", std::nullopt, line);
+    tokens.emplace_back(END_OF_FILE, "", std::nullopt, line);
 
     return tokens;
 }
@@ -58,7 +58,7 @@ const std::vector<token>& cfp::scanner::scanner::getTokens() {
  * @brief return token located at the current position
  * @return token
  */
-void cfp::scanner::scanner::scanToken() {
+void scanner::scanToken() {
     char ch = advance();
 
     switch (ch) {
@@ -111,7 +111,7 @@ void cfp::scanner::scanner::scanToken() {
  * @param lexeme lexeme
  * @param literal literal
  */
-void cfp::scanner::scanner::addToken(const token::tokenType &type, const std::optional<literal> &literal) {
+void scanner::addToken(const token::tokenType &type, const std::optional<literal> &literal) {
     tokens.emplace_back(type, source.substr(start, current-start), literal, line);
 }
 
@@ -120,7 +120,7 @@ void cfp::scanner::scanner::addToken(const token::tokenType &type, const std::op
 /*!
  * @return true if current in the end of source
  */
-bool cfp::scanner::scanner::isAtEnd() const {
+bool scanner::isAtEnd() const {
     return current>=source.size();
 }
 
@@ -129,7 +129,7 @@ bool cfp::scanner::scanner::isAtEnd() const {
  * @brief return current symbol and advance it
  * @return current symbol
  */
-char cfp::scanner::scanner::advance() {
+char scanner::advance() {
     return isAtEnd()?'\0':source[current++];
 }
 
@@ -139,7 +139,7 @@ char cfp::scanner::scanner::advance() {
  * @param expected expected character
  * @return true if expected equal a current character
  */
-bool cfp::scanner::scanner::match(const char expected) {
+bool scanner::match(const char expected) {
     if(isAtEnd()&&source[current]!=expected) return false;
     ++current;
     return true;
@@ -149,7 +149,7 @@ bool cfp::scanner::scanner::match(const char expected) {
 /*!
  * @return current character or null terminator if it is at end
  */
-char cfp::scanner::scanner::peek() const {
+char scanner::peek() const {
     return isAtEnd()?'\0':source[current];
 }
 
@@ -157,7 +157,7 @@ char cfp::scanner::scanner::peek() const {
 /*!
  * @return next character or null terminator if it is at end
  */
-char cfp::scanner::scanner::peekNext() const {
+char scanner::peekNext() const {
     if(current+1>=source.size()) return '\0';
     return source[current+1];
 }
@@ -168,7 +168,7 @@ char cfp::scanner::scanner::peekNext() const {
  * @brief digits are 0-9
  * @return true if ch is digit
  */
-bool cfp::scanner::scanner::isDigit(const char ch) {
+bool scanner::isDigit(const char ch) {
     return std::isdigit(ch);
 }
 
@@ -177,7 +177,7 @@ bool cfp::scanner::scanner::isDigit(const char ch) {
 /*!
  * @return true if ch is digit ur alphabetic
  */
-bool cfp::scanner::scanner::isAlphaNumber(const char ch) {
+bool scanner::isAlphaNumber(const char ch) {
     return isDigit(ch) || isAlpha(ch);
 }
 
@@ -187,7 +187,7 @@ bool cfp::scanner::scanner::isAlphaNumber(const char ch) {
  * @brief alphabetic characters are uppercase/lowercase english letters and '_'
  * @return true if ch is alphabetic character
  */
-bool cfp::scanner::scanner::isAlpha(const char ch) {
+bool scanner::isAlpha(const char ch) {
     return std::isalpha(ch)||ch=='_';
 }
 
@@ -196,7 +196,7 @@ bool cfp::scanner::scanner::isAlpha(const char ch) {
 /*!
  * @brief add string literal token
  */
-void cfp::scanner::scanner::string() {
+void scanner::string() {
     while (!isAtEnd() && peek()!='\"') {
         if(peek()=='\n') ++line;
         advance();
@@ -220,7 +220,7 @@ void cfp::scanner::scanner::string() {
 /*!
  * @brief add number literal token
  */
-void cfp::scanner::scanner::number() {
+void scanner::number() {
     while (std::isdigit(peek())) advance();
 
     // Fractional part
@@ -241,7 +241,7 @@ void cfp::scanner::scanner::number() {
 /*!
  * @brief add identifier token
  */
-void cfp::scanner::scanner::identifier() {
+void scanner::identifier() {
     while (isAlphaNumber(peek())) advance();
 
     // add token

@@ -4,7 +4,7 @@
 #include "token.hpp"
 #include "../io/reporter.hpp"
 
-namespace cfp::scanner {
+namespace cfp::scan {
     class scanner {
     public:
         explicit scanner(std::string source, const io::reporter& reporter);

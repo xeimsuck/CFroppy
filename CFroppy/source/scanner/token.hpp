@@ -3,7 +3,7 @@
 #include <string>
 #include "literal.hpp"
 
-namespace cfp::scanner {
+namespace cfp::scan {
     struct token {
         enum class tokenType {
             // Single-character tokens.
@@ -28,9 +28,9 @@ namespace cfp::scanner {
 
         tokenType type;
         std::string lexeme;
-        std::optional<scanner::literal> literal;
+        std::optional<scan::literal> literal;
         int line;
 
-        token(tokenType type, std::string lexeme, std::optional<scanner::literal> literal, int line);
+        token(tokenType type, std::string lexeme, std::optional<scan::literal> literal, int line);
     };
 }
