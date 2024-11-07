@@ -1,7 +1,10 @@
 #include "token.hpp"
 
-cfp::token::token(const tokenType _type, std::string _lexeme, std::optional<cfp::literal> _literal, const int _line)
-                    : lexeme(std::move(_lexeme)), literal(std::move(_literal)) {
-    type = _type;
-    line = _line;
+using namespace cfp;
+using namespace cfp::scanner;
+
+token::token(const tokenType type, std::string lexeme, std::optional<scanner::literal> literal, const int line)
+                    : lexeme(std::move(lexeme)), literal(std::move(literal)) {
+    this->type = type;
+    this->line = line;
 }

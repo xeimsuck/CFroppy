@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace cpf {
+namespace cfp::io {
     class reporter {
     public:
         explicit reporter(std::ostream& out = std::cout,

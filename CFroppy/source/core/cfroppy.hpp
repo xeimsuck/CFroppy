@@ -2,7 +2,7 @@
 #include <string>
 #include "../io/reporter.hpp"
 
-namespace cfp {
+namespace cfp::core {
     class cfroppy {
     public:
         cfroppy(const cfroppy&) = delete;
@@ -21,6 +21,6 @@ namespace cfp {
         int prompt();
 
     private:
-        cpf::reporter reporter;
+        io::reporter reporter;
     };
 }

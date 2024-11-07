@@ -2,7 +2,8 @@
 #include <iostream>
 #include <format>
 
-using namespace cpf;
+using namespace cfp;
+using namespace cfp::io;
 
 reporter::reporter(std::ostream &out, std::istream &in, std::ostream &err) : out(out), err(err), in(in){
 }

@@ -4,10 +4,10 @@
 #include "token.hpp"
 #include "../io/reporter.hpp"
 
-namespace cfp {
+namespace cfp::scanner {
     class scanner {
     public:
-        explicit scanner(std::string source, const cpf::reporter& reporter);
+        explicit scanner(std::string source, const io::reporter& reporter);
         const std::vector<token>& getTokens();
     private:
         void scanToken();
@@ -28,7 +28,7 @@ namespace cfp {
         void identifier();
 
     private:
-        const cpf::reporter& reporter;
+        const io::reporter& reporter;
         std::string source;
         std::vector<token> tokens;
         int start = 0, current = 0, line = 1;

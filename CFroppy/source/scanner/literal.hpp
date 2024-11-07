@@ -2,7 +2,7 @@
 #include <string>
 #include <variant>
 
-namespace cfp {
+namespace cfp::scanner {
     namespace types {
         using nil = std::monostate;
         using integer = long long;
