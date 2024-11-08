@@ -41,7 +41,7 @@ cfp::scan::scanner::scanner(std::string source, const io::reporter& reporter)
  * @brief scan source file and return tokens
  * @return all tokens
  */
-const std::vector<token>& scanner::getTokens() {
+std::vector<token>& scanner::getTokens() {
     if(!tokens.empty()) return tokens;
 
     while(!isAtEnd()) {

@@ -8,7 +8,7 @@ namespace cfp::scan {
     class scanner {
     public:
         explicit scanner(std::string source, const io::reporter& reporter);
-        const std::vector<token>& getTokens();
+        std::vector<token>& getTokens();
     private:
         void scanToken();
         void addToken(const token::tokenType& type, const std::optional<literal>& literal = std::nullopt);
