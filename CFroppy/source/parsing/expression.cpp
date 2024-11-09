@@ -5,7 +5,8 @@ using namespace cfp;
 using namespace cfp::parse;
 
 
-binary::binary(expression &left, expression &right, scan::token oper)  : left(left), right(right), oper(std::move(oper)) {
+binary::binary(std::unique_ptr<expression> left, std::unique_ptr<expression> right, scan::token oper)
+            : left(std::move(left)), right(std::move(right)), oper(std::move(oper)) {
 }
 
 void binary::accept(astVisitor &visitor) {
@@ -17,7 +18,7 @@ void grouping::accept(astVisitor &visitor) {
     visitor.visit(*this);
 }
 
-grouping::grouping(expression &expr) : expr(expr) {
+grouping::grouping(std::unique_ptr<expression> expr) : expr(std::move(expr)) {
 }
 
 
@@ -29,7 +30,7 @@ void literal::accept(astVisitor &visitor) {
 }
 
 
-unary::unary(expression &expr, scan::token oper) : expr(expr), oper(std::move(oper)){
+unary::unary(std::unique_ptr<expression> expr, scan::token oper) : expr(std::move(expr)), oper(std::move(oper)){
 }
 
 void unary::accept(astVisitor &visitor) {

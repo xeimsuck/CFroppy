@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "../scanner/token.hpp"
 
 namespace cfp::parse {
@@ -11,21 +12,21 @@ namespace cfp::parse {
     };
 
     struct binary final : expression {
-        binary(expression& left, expression& right, scan::token oper);
+        binary(std::unique_ptr<expression> left, std::unique_ptr<expression> right, scan::token oper);
 
         void accept(astVisitor& visitor) override;
 
-        expression& left;
-        expression& right;
+        std::unique_ptr<expression> left;
+        std::unique_ptr<expression> right;
         scan::token oper;
     };
 
     struct grouping final : expression {
-        explicit grouping(expression& expr);
+        explicit grouping(std::unique_ptr<expression> expr);
 
         void accept(astVisitor &visitor) override;
 
-        expression& expr;
+        std::unique_ptr<expression> expr;
     };
 
     struct literal final : expression {
@@ -37,11 +38,11 @@ namespace cfp::parse {
     };
 
     struct unary final : expression {
-        explicit unary(expression& expr, scan::token oper);
+        explicit unary(std::unique_ptr<expression> expr, scan::token oper);
 
         void accept(astVisitor &visitor) override;
 
-        expression& expr;
+        std::unique_ptr<expression> expr;
         scan::token oper;
     };
 }
