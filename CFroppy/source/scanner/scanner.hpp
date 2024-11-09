@@ -11,7 +11,7 @@ namespace cfp::scan {
         std::vector<token>& getTokens();
     private:
         void scanToken();
-        void addToken(const token::tokenType& type, const std::optional<literal>& literal = std::nullopt);
+        void addToken(const token::tokenType& type, scan::literal literal = {});
         [[nodiscard]] bool isAtEnd() const;
 
         char advance();

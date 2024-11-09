@@ -28,9 +28,9 @@ namespace cfp::scan {
 
         tokenType type;
         std::string lexeme;
-        std::optional<scan::literal> literal;
+        scan::literal literal;
         int line;
 
-        token(tokenType type, std::string lexeme, std::optional<scan::literal> literal, int line);
+        token(tokenType type, std::string lexeme, scan::literal literal, int line);
     };
 }

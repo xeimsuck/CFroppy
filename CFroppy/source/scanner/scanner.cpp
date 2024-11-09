@@ -48,7 +48,7 @@ std::vector<token>& scanner::getTokens() {
         scanToken();
         start = current;
     }
-    tokens.emplace_back(END_OF_FILE, "", std::nullopt, line);
+    tokens.emplace_back(END_OF_FILE, "", literal{}, line);
 
     return tokens;
 }
@@ -111,8 +111,8 @@ void scanner::scanToken() {
  * @param lexeme lexeme
  * @param literal literal
  */
-void scanner::addToken(const token::tokenType &type, const std::optional<literal> &literal) {
-    tokens.emplace_back(type, source.substr(start, current-start), literal, line);
+void scanner::addToken(const token::tokenType &type, literal literal) {
+    tokens.emplace_back(type, source.substr(start, current-start), std::move(literal), line);
 }
 
 
