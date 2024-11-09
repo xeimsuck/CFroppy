@@ -9,10 +9,12 @@ namespace cfp::scan {
         using decimal = double;
         using boolean = bool;
         using string = std::string;
+
+        inline constexpr nil nil_v;
     }
     class literal {
     public:
-        literal() = default;
+        explicit literal(types::nil = types::nil_v);
         explicit literal(types::integer val);
         explicit literal(types::decimal val);
         explicit literal(types::string val);
@@ -32,6 +34,7 @@ namespace cfp::scan {
         void setInteger(types::integer);
         void setDecimal(types::decimal);
         void setString(types::string);
+        void setNil();
 
     private:
         std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string> value;

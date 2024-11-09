@@ -4,6 +4,10 @@ using namespace cfp;
 using namespace cfp::scan;
 using namespace cfp::scan::types;
 
+literal::literal(nil val) {
+    value = val;
+}
+
 literal::literal(boolean val) {
     value = val;
 }
@@ -50,4 +54,8 @@ void literal::setDecimal(decimal val) {
 
 void literal::setString(string val) {
     value = std::move(val);
+}
+
+void literal::setNil() {
+    value = nil_v;
 }
