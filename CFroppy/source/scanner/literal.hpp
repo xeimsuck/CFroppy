@@ -14,7 +14,7 @@ namespace cfp::scan {
     }
     class literal {
     public:
-        explicit literal(types::nil = types::nil_v);
+        literal(types::nil = types::nil_v);
         explicit literal(types::integer val);
         explicit literal(types::decimal val);
         explicit literal(types::string val);
