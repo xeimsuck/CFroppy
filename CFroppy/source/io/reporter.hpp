@@ -9,9 +9,9 @@ namespace cfp::io {
         explicit reporter(std::ostream& out = std::cout,
                         std::istream& in = std::cin,
                         std::ostream& err = std::cerr);
-        void info(int line, const std::string& msg) const;
-        void warning(int line, const std::string& msg) const;
-        void error(int line, const std::string& msg) const;
+        void info(int line, const std::string& where, const std::string& msg) const;
+        void warning(int line, const std::string& where, const std::string& msg) const;
+        void error(int line, const std::string& where, const std::string& msg) const;
         void message(const std::string& msg, bool error = false) const;
         bool getHadError() const;
         void resetHadError() const;
@@ -21,7 +21,7 @@ namespace cfp::io {
             WARNING,
             ERROR,
         };
-        void report(int line, const messageType& type, const std::string& msg) const;
+        void report(int line, const messageType& type, const std::string& where, const std::string& msg) const;
 
     private:
         mutable bool hadError = false;
