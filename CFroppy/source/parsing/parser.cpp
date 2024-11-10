@@ -207,9 +207,9 @@ std::unique_ptr<expression> parser::primary() {
         return std::make_unique<literal>(previous().literal);
     }
 
-    if(match(LEFT_BRACE)) {
+    if(match(LEFT_PAREN)) {
         auto expr = std::make_unique<grouping>(this->expr());
-        consume(RIGHT_BRACE, "Expect \')\' after expression.");
+        consume(RIGHT_PAREN, "Expect \')\' after expression.");
         return expr;
     }
 
