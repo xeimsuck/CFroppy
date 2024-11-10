@@ -1,6 +1,8 @@
 #include "cfroppy.hpp"
 #include <fstream>
 #include <iostream>
+
+#include "../parsing/parser.hpp"
 #include "../scanner/scanner.hpp"
 
 using namespace cfp;
@@ -45,9 +47,10 @@ int cfroppy::run(const int argc, char **argv) {
 int cfroppy::execute(const std::string &source) {
     scan::scanner scanner(source, reporter);
     decltype(auto) tokens = scanner.getTokens();
-    for (auto& token : tokens) {
 
-    }
+    parse::parser parser(tokens, reporter);
+    decltype(auto) ast = parser.parse();
+
     return reporter.getHadError()?1:0;
 }
 
