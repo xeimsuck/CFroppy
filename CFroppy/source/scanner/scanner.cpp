@@ -140,7 +140,7 @@ char scanner::advance() {
  * @return true if expected equal a current character
  */
 bool scanner::match(const char expected) {
-    if(isAtEnd()&&source[current]!=expected) return false;
+    if(isAtEnd()||source[current]!=expected) return false;
     ++current;
     return true;
 }
