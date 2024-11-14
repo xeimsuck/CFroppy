@@ -9,13 +9,13 @@ binary::binary(std::unique_ptr<expression> left, std::unique_ptr<expression> rig
             : left(std::move(left)), right(std::move(right)), oper(std::move(oper)) {
 }
 
-void binary::accept(astVisitor &visitor) {
-    visitor.visit(*this);
+scan::literal binary::accept(astVisitor &visitor) {
+    return visitor.visit(*this);
 }
 
 
-void grouping::accept(astVisitor &visitor) {
-    visitor.visit(*this);
+scan::literal grouping::accept(astVisitor &visitor) {
+    return visitor.visit(*this);
 }
 
 grouping::grouping(std::unique_ptr<expression> expr) : expr(std::move(expr)) {
@@ -25,14 +25,14 @@ grouping::grouping(std::unique_ptr<expression> expr) : expr(std::move(expr)) {
 literal::literal(scan::literal value) : value(std::move(value)) {
 }
 
-void literal::accept(astVisitor &visitor) {
-    visitor.visit(*this);
+scan::literal literal::accept(astVisitor &visitor) {
+    return visitor.visit(*this);
 }
 
 
 unary::unary(std::unique_ptr<expression> expr, scan::token oper) : expr(std::move(expr)), oper(std::move(oper)){
 }
 
-void unary::accept(astVisitor &visitor) {
-    visitor.visit(*this);
+scan::literal unary::accept(astVisitor &visitor) {
+    return visitor.visit(*this);
 }

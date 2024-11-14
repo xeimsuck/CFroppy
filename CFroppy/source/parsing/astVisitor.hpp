@@ -13,10 +13,13 @@ namespace cfp::parse {
     public:
         virtual ~astVisitor() = default;
 
-        void visit(expression& expr);
-        virtual void visit(binary& expr) = 0;
-        virtual void visit(grouping& expr) = 0;
-        virtual void visit(literal& expr) = 0;
-        virtual void visit(unary& expr) = 0;
+        scan::literal visit(expression& expr) {
+            return expr.accept(*this);
+        }
+
+        virtual scan::literal visit(binary& expr) = 0;
+        virtual scan::literal visit(grouping& expr) = 0;
+        virtual scan::literal visit(literal& expr) = 0;
+        virtual scan::literal visit(unary& expr) = 0;
     };
 }

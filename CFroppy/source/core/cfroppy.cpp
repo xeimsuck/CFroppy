@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "../interpreting/interpreter .hpp"
 #include "../parsing/parser.hpp"
 #include "../scanner/scanner.hpp"
 
@@ -50,6 +51,9 @@ int cfroppy::execute(const std::string &source) {
 
     parse::parser parser(tokens, reporter);
     decltype(auto) ast = parser.parse();
+
+    interpreting::interpreter interpreter;
+    ast->accept(interpreter);
 
     return reporter.getHadError()?1:0;
 }

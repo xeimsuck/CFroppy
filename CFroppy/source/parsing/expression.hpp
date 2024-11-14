@@ -8,13 +8,13 @@ namespace cfp::parse {
     struct expression {
         virtual ~expression() = default;
 
-        virtual void accept(astVisitor& visitor) = 0;
+        virtual scan::literal accept(astVisitor& visitor) = 0;
     };
 
     struct binary final : expression {
         binary(std::unique_ptr<expression> left, std::unique_ptr<expression> right, scan::token oper);
 
-        void accept(astVisitor& visitor) override;
+        scan::literal accept(astVisitor& visitor) override;
 
         std::unique_ptr<expression> left;
         std::unique_ptr<expression> right;
@@ -24,7 +24,7 @@ namespace cfp::parse {
     struct grouping final : expression {
         explicit grouping(std::unique_ptr<expression> expr);
 
-        void accept(astVisitor &visitor) override;
+        scan::literal accept(astVisitor &visitor) override;
 
         std::unique_ptr<expression> expr;
     };
@@ -32,7 +32,7 @@ namespace cfp::parse {
     struct literal final : expression {
         explicit literal(scan::literal value);
 
-        void accept(astVisitor &visitor) override;
+        scan::literal accept(astVisitor &visitor) override;
 
         scan::literal value;
     };
@@ -40,7 +40,7 @@ namespace cfp::parse {
     struct unary final : expression {
         explicit unary(std::unique_ptr<expression> expr, scan::token oper);
 
-        void accept(astVisitor &visitor) override;
+        scan::literal accept(astVisitor &visitor) override;
 
         std::unique_ptr<expression> expr;
         scan::token oper;
