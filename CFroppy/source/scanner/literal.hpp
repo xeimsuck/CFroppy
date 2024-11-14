@@ -36,6 +36,20 @@ namespace cfp::scan {
         void setString(types::string);
         void setNil();
 
+
+        bool operator==(const literal & rhs) const;
+        bool operator!=(const literal & rhs) const;
+        bool operator>(const literal& rhs) const;
+        bool operator>=(const literal& rhs) const;
+        bool operator<(const literal& rhs) const;
+        bool operator<=(const literal& rhs) const;
+        literal operator-() const;
+        explicit operator bool() const;
+        bool operator!() const;
+        literal operator+(const literal& rhs) const;
+        literal operator-(const literal& rhs) const;
+        literal operator*(const literal& rhs) const;
+        literal operator/(const literal& rhs) const;
     private:
         std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string> value;
     };

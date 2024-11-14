@@ -59,3 +59,93 @@ void literal::setString(string val) {
 void literal::setNil() {
     value = nil_v;
 }
+
+bool literal::operator==(const literal &rhs) const {
+    return value==rhs.value;
+}
+
+bool literal::operator!=(const literal &rhs) const {
+    return value!=rhs.value;
+}
+
+bool literal::operator>(const literal &rhs) const {
+    return value>rhs.value;
+}
+
+bool literal::operator>=(const literal &rhs) const {
+    return value>rhs.value;
+}
+
+bool literal::operator<(const literal &rhs) const {
+    return value>rhs.value;
+}
+
+bool literal::operator<=(const literal &rhs) const {
+    return value>rhs.value;
+}
+
+literal literal::operator-() const {
+    if(has<integer>()) {
+        return literal(-getInteger());
+    }
+    if(has<decimal>()) {
+        return literal(-getDecimal());
+    }
+    return {};
+}
+
+literal::operator bool() const {
+    if(has<boolean>()) return getBoolean();
+    return !has<nil>();
+}
+
+bool literal::operator!() const {
+    return !static_cast<bool>(*this);
+}
+
+literal literal::operator+(const literal &rhs) const {
+    if(has<types::integer>()) {
+        if(rhs.has<types::integer>()) return literal(getInteger() + rhs.getInteger());
+        if(rhs.has<types::decimal>()) return literal(static_cast<types::decimal>(getInteger()) + rhs.getDecimal());
+    } else if(has<types::decimal>()) {
+        if(rhs.has<types::integer>()) return literal(getDecimal() + static_cast<types::decimal>(getInteger()));
+        if(rhs.has<types::decimal>()) return literal(getDecimal() + rhs.getDecimal());
+    } else if(has<types::string>() && rhs.has<types::string>()) {
+        return scan::literal(getString()+rhs.getString());
+    }
+    return {};
+}
+
+literal literal::operator-(const literal &rhs) const {
+
+    if(has<types::integer>()) {
+        if(rhs.has<types::integer>()) return literal(getInteger() - rhs.getInteger());
+        if(rhs.has<types::decimal>()) return literal(static_cast<types::decimal>(getInteger()) - rhs.getDecimal());
+    } else if(has<types::decimal>()) {
+        if(rhs.has<types::integer>()) return literal(getDecimal() - static_cast<types::decimal>(getInteger()));
+        if(rhs.has<types::decimal>()) return literal(getDecimal() - rhs.getDecimal());
+    }
+    return {};
+}
+
+literal literal::operator*(const literal &rhs) const {
+    if(has<types::integer>()) {
+        if(rhs.has<types::integer>()) return literal(getInteger() * rhs.getInteger());
+        if(rhs.has<types::decimal>()) return literal(static_cast<types::decimal>(getInteger()) * rhs.getDecimal());
+    } else if(has<types::decimal>()) {
+        if(rhs.has<types::integer>()) return literal(getDecimal() * static_cast<types::decimal>(getInteger()));
+        if(rhs.has<types::decimal>()) return literal(getDecimal() * rhs.getDecimal());
+    }
+    return {};
+}
+
+literal literal::operator/(const literal &rhs) const {
+    if(has<types::integer>()) {
+        if(rhs.has<types::integer>()) return literal(getInteger() / rhs.getInteger());
+        if(rhs.has<types::decimal>()) return literal(static_cast<types::decimal>(getInteger()) / rhs.getDecimal());
+    } else if(has<types::decimal>()) {
+        if(rhs.has<types::integer>()) return literal(getDecimal() / static_cast<types::decimal>(getInteger()));
+        if(rhs.has<types::decimal>()) return literal(getDecimal() / rhs.getDecimal());
+    }
+    return {};
+}
