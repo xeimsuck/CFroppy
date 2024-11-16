@@ -120,7 +120,7 @@ std::unique_ptr<expr::expression> parser::expr() {
 std::unique_ptr<expr::expression> parser::equality() {
     decltype(auto) expr = comparison();
 
-    while (match(BANG, BANG_EQUAL)) {
+    while (match(EQUAL_EQUAL, BANG_EQUAL)) {
         decltype(auto) oper = previous();
         decltype(auto) right = comparison();
         expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), oper);
