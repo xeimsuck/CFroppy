@@ -60,6 +60,15 @@ void literal::setNil() {
     value = nil_v;
 }
 
+std::string literal::stringify() const {
+    if(has<boolean>()) return getBoolean() ? "true" : "false";
+    if(has<string>()) return getString();
+    if(has<integer>()) return std::to_string(getInteger());
+    if(has<decimal>()) return std::to_string(getDecimal());
+    return "nil";
+}
+
+
 bool literal::operator==(const literal &rhs) const {
     return value==rhs.value;
 }
@@ -148,4 +157,8 @@ literal literal::operator/(const literal &rhs) const {
         if(rhs.has<types::decimal>()) return literal(getDecimal() / rhs.getDecimal());
     }
     return {};
+}
+
+literal::operator std::string() const {
+    return stringify();
 }
