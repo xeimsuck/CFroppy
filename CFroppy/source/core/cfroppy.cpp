@@ -49,11 +49,11 @@ int cfroppy::execute(const std::string &source) {
     decltype(auto) tokens = scanner.getTokens();
 
     parse::parser parser(tokens, reporter);
-    const auto ast = parser.parse();
+    const auto stmts = parser.parse();
 
     if(!reporter.getHadError()) {
         interpreting::interpreter interpreter;
-        ast->accept(interpreter);
+        interpreter.interpret(stmts);
     }
 
     return reporter.getHadError()?1:0;

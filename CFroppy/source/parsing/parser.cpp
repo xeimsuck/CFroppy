@@ -25,12 +25,12 @@ parser::parse_error::parse_error(const std::string &err) : runtime_error(err) {
  * @brief execute a parser
  * @return root of AST
  */
-std::unique_ptr<expr::expression> parser::parse() {
-    try {
-        return expr();
-    } catch (const parse_error& err) {
-        return nullptr;
+std::vector<std::unique_ptr<stmt::statement>> parser::parse() {
+    std::vector<std::unique_ptr<stmt::statement>> statements;
+    while (!isAtEnd()) {
+        statements.push_back(statement());
     }
+    return statements;
 }
 
 
@@ -241,4 +241,29 @@ void parser::synchronize() {
         }
         advance();
     }
+}
+
+/*!
+ * @brief parse a current statement
+ * @return statement
+ */
+std::unique_ptr<stmt::statement> parser::statement() {
+    if(match(PRINT)) return printStatement();
+    return expressionStatement();
+}
+
+/*!
+ * @brief parse print statement
+ * @return print statement
+ */
+std::unique_ptr<stmt::print> parser::printStatement() {
+    decltype(auto) expr = this->expr();
+    consume(SEMICOLON, "Expected ; after expression.");
+    return std::make_unique<stmt::print>(std::move(expr));
+}
+
+std::unique_ptr<stmt::expression> parser::expressionStatement() {
+    decltype(auto) expr = this->expr();
+    consume(SEMICOLON, "Expected ; after expression.");
+    return std::make_unique<stmt::expression>(std::move(expr));
 }

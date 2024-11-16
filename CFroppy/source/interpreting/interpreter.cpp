@@ -1,9 +1,22 @@
 #include "interpreter.hpp"
+#include "iostream"
 
 using namespace cfp;
 using namespace cfp::interpreting;
 using namespace scan::types;
 using enum scan::token::tokenType;
+
+void interpreter::interpret(const std::vector<std::unique_ptr<ast::stmt::statement>> &stmts) {
+    for(decltype(auto) stmt : stmts) {
+        execute(stmt);
+    }
+}
+
+void interpreter::execute(const std::unique_ptr<ast::stmt::statement> &stmt) {
+    stmt->accept(*this);
+}
+
+
 
 scan::literal interpreter::visit(ast::expr::binary &expr) {
     const auto left = evaluate(expr.left);
@@ -42,6 +55,16 @@ scan::literal interpreter::visit(ast::expr::unary &expr) {
             return scan::literal(!right);
         default: return {};
     }
+}
+
+
+void interpreter::visit(ast::stmt::expression &stmt) {
+    evaluate(stmt.expr);
+}
+
+void interpreter::visit(ast::stmt::print &stmt) {
+    const auto literal = evaluate(stmt.expr);
+    std::cout << literal.stringify() << std::endl;
 }
 
 

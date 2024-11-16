@@ -1,51 +1,64 @@
 #pragma once
 #include <memory>
-#include "visitor.hpp"
 #include "../scanner/token.hpp"
 
-namespace cfp::ast {
-    class visitor;
+namespace cfp::ast::expr {
+    struct expression;
+    struct binary;
+    struct grouping;
+    struct literal;
+    struct unary;
 
-    namespace expr {
-        struct expression {
-            virtual ~expression() = default;
+    class exprVisitor {
+    public:
+        virtual ~exprVisitor() = default;
 
-            virtual scan::literal accept(visitor& visitor) = 0;
-        };
+        scan::literal visit(expression& expr);
 
-        struct binary final : expression {
-            binary(std::unique_ptr<expression> left, std::unique_ptr<expression> right, scan::token oper);
+        virtual scan::literal visit(binary& expr) = 0;
+        virtual scan::literal visit(grouping& expr) = 0;
+        virtual scan::literal visit(literal& expr) = 0;
+        virtual scan::literal visit(unary& expr) = 0;
+    };
 
-            scan::literal accept(visitor& visitor) override;
+    struct expression {
+        virtual ~expression() = default;
 
-            std::unique_ptr<expression> left;
-            std::unique_ptr<expression> right;
-            scan::token oper;
-        };
+        virtual scan::literal accept(exprVisitor& visitor) = 0;
+    };
 
-        struct grouping final : expression {
-            explicit grouping(std::unique_ptr<expression> expr);
+    struct binary final : expression {
+        binary(std::unique_ptr<expression>&& left, std::unique_ptr<expression>&& right, scan::token oper);
 
-            scan::literal accept(visitor &visitor) override;
+        scan::literal accept(exprVisitor& visitor) override;
 
-            std::unique_ptr<expression> expr;
-        };
+        std::unique_ptr<expression> left;
+        std::unique_ptr<expression> right;
+        scan::token oper;
+    };
 
-        struct literal final : expression {
-            explicit literal(scan::literal value);
+    struct grouping final : expression {
+        explicit grouping(std::unique_ptr<expression>&& expr);
 
-            scan::literal accept(visitor &visitor) override;
+        scan::literal accept(exprVisitor &visitor) override;
 
-            scan::literal value;
-        };
+        std::unique_ptr<expression> expr;
+    };
 
-        struct unary final : expression {
-            explicit unary(std::unique_ptr<expression> expr, scan::token oper);
+    struct literal final : expression {
+        explicit literal(scan::literal value);
 
-            scan::literal accept(visitor &visitor) override;
+        scan::literal accept(exprVisitor &visitor) override;
 
-            std::unique_ptr<expression> expr;
-            scan::token oper;
-        };
-    }
+        scan::literal value;
+    };
+
+    struct unary final : expression {
+        explicit unary(std::unique_ptr<expression>&& expr, scan::token oper);
+
+        scan::literal accept(exprVisitor &visitor) override;
+
+        std::unique_ptr<expression> expr;
+        scan::token oper;
+    };
 }
