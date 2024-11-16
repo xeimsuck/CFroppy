@@ -82,15 +82,15 @@ bool literal::operator>(const literal &rhs) const {
 }
 
 bool literal::operator>=(const literal &rhs) const {
-    return value>rhs.value;
+    return value>=rhs.value;
 }
 
 bool literal::operator<(const literal &rhs) const {
-    return value>rhs.value;
+    return value<rhs.value;
 }
 
 bool literal::operator<=(const literal &rhs) const {
-    return value>rhs.value;
+    return value<=rhs.value;
 }
 
 literal literal::operator-() const {
