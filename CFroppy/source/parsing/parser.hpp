@@ -12,7 +12,7 @@ namespace cfp::parse {
     class parser {
     public:
         parser(std::vector<scan::token>& tokens, const io::reporter& reporter);
-        std::unique_ptr<ast::expression> parse();
+        std::unique_ptr<ast::expr::expression> parse();
 
         class parse_error final : public std::runtime_error {
         public:
@@ -20,13 +20,13 @@ namespace cfp::parse {
         };
 
     private:
-        std::unique_ptr<ast::expression> expr();
-        std::unique_ptr<ast::expression> equality();
-        std::unique_ptr<ast::expression> comparison();
-        std::unique_ptr<ast::expression> term();
-        std::unique_ptr<ast::expression> factor();
-        std::unique_ptr<ast::expression> unary();
-        std::unique_ptr<ast::expression> primary();
+        std::unique_ptr<ast::expr::expression> expr();
+        std::unique_ptr<ast::expr::expression> equality();
+        std::unique_ptr<ast::expr::expression> comparison();
+        std::unique_ptr<ast::expr::expression> term();
+        std::unique_ptr<ast::expr::expression> factor();
+        std::unique_ptr<ast::expr::expression> unary();
+        std::unique_ptr<ast::expr::expression> primary();
 
         void synchronize();
 

@@ -3,6 +3,6 @@
 using namespace cfp;
 using namespace cfp::ast;
 
-scan::literal visitor::visit(expression &expr)  {
+scan::literal visitor::visit(expr::expression &expr)  {
     return expr.accept(*this);
 }

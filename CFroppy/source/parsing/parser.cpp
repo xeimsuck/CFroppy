@@ -3,6 +3,7 @@
 using namespace cfp;
 using namespace cfp::parse;
 using namespace cfp::scan;
+using namespace cfp::ast;
 using enum token::tokenType;
 
 /*!
@@ -24,7 +25,7 @@ parser::parse_error::parse_error(const std::string &err) : runtime_error(err) {
  * @brief execute a parser
  * @return root of AST
  */
-std::unique_ptr<ast::expression> parser::parse() {
+std::unique_ptr<expr::expression> parser::parse() {
     try {
         return expr();
     } catch (const parse_error& err) {
@@ -107,7 +108,7 @@ token &parser::previous() const {
  * @brief check expr productions
  * @return expression
  */
-std::unique_ptr<ast::expression> parser::expr() {
+std::unique_ptr<expr::expression> parser::expr() {
     return equality();
 }
 
@@ -116,13 +117,13 @@ std::unique_ptr<ast::expression> parser::expr() {
  * @brief check equality productions
  * @return expression
  */
-std::unique_ptr<ast::expression> parser::equality() {
+std::unique_ptr<expr::expression> parser::equality() {
     decltype(auto) expr = comparison();
 
     while (match(BANG, BANG_EQUAL)) {
         decltype(auto) oper = previous();
         decltype(auto) right = comparison();
-        expr = std::make_unique<ast::binary>(std::move(expr), std::move(right), oper);
+        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), oper);
     }
 
     return expr;
@@ -133,13 +134,13 @@ std::unique_ptr<ast::expression> parser::equality() {
  * @brief check comparision productions
  * @return expression
  */
-std::unique_ptr<ast::expression> parser::comparison() {
+std::unique_ptr<expr::expression> parser::comparison() {
     decltype(auto) expr = term();
 
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
         decltype(auto) oper = previous();
         decltype(auto) right = term();
-        expr = std::make_unique<ast::binary>(std::move(expr), std::move(right), oper);
+        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), oper);
     }
 
     return expr;
@@ -150,13 +151,13 @@ std::unique_ptr<ast::expression> parser::comparison() {
  * @brief check term productions
  * @return expression
  */
-std::unique_ptr<ast::expression> parser::term() {
+std::unique_ptr<expr::expression> parser::term() {
     decltype(auto) expr = factor();
 
     while (match(PLUS, MINUS)) {
         decltype(auto) oper = previous();
         decltype(auto) right = factor();
-        expr = std::make_unique<ast::binary>(std::move(expr), std::move(right), oper);
+        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), oper);
     }
 
     return expr;
@@ -167,13 +168,13 @@ std::unique_ptr<ast::expression> parser::term() {
  * @brief check factor productions
  * @return expression
  */
-std::unique_ptr<ast::expression> parser::factor() {
+std::unique_ptr<expr::expression> parser::factor() {
     decltype(auto) expr = unary();
 
     while (match(STAR, SLASH)) {
         decltype(auto) oper = previous();
         decltype(auto) right = unary();
-        expr = std::make_unique<ast::binary>(std::move(expr), std::move(right), oper);
+        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), oper);
     }
 
     return expr;
@@ -184,10 +185,10 @@ std::unique_ptr<ast::expression> parser::factor() {
  * @brief check unary productions
  * @return expression
  */
-std::unique_ptr<ast::expression> parser::unary() {
+std::unique_ptr<expr::expression> parser::unary() {
     if(match(BANG, MINUS)) {
         decltype(auto) oper = previous();
-        return  std::make_unique<ast::unary>(primary(), oper);
+        return  std::make_unique<expr::unary>(primary(), oper);
     }
 
     return primary();
@@ -198,17 +199,17 @@ std::unique_ptr<ast::expression> parser::unary() {
  * @brief check primary productions
  * @return expression
  */
-std::unique_ptr<ast::expression> parser::primary() {
-    if(match(TRUE)) return std::make_unique<ast::literal>(literal{true});
-    if(match(FALSE)) return std::make_unique<ast::literal>(literal{false});
-    if(match(NIL)) return std::make_unique<ast::literal>(literal{});
+std::unique_ptr<expr::expression> parser::primary() {
+    if(match(TRUE)) return std::make_unique<expr::literal>(literal{true});
+    if(match(FALSE)) return std::make_unique<expr::literal>(literal{false});
+    if(match(NIL)) return std::make_unique<expr::literal>(literal{});
 
     if(match(NUMBER, STRING)) {
-        return std::make_unique<ast::literal>(previous().literal);
+        return std::make_unique<expr::literal>(previous().literal);
     }
 
     if(match(LEFT_PAREN)) {
-        auto expr = std::make_unique<ast::grouping>(this->expr());
+        auto expr = std::make_unique<expr::grouping>(this->expr());
         consume(RIGHT_PAREN, "Expect \')\' after expression.");
         return expr;
     }

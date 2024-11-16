@@ -5,7 +5,7 @@ using namespace cfp::interpreting;
 using namespace scan::types;
 using enum scan::token::tokenType;
 
-scan::literal interpreter::visit(ast::binary &expr) {
+scan::literal interpreter::visit(ast::expr::binary &expr) {
     const auto left = evaluate(expr.left);
     const auto right = evaluate(expr.right);
 
@@ -24,15 +24,15 @@ scan::literal interpreter::visit(ast::binary &expr) {
     }
 }
 
-scan::literal interpreter::visit(ast::grouping &expr) {
+scan::literal interpreter::visit(ast::expr::grouping &expr) {
     return evaluate(expr.expr);
 }
 
-scan::literal interpreter::visit(ast::literal &expr) {
+scan::literal interpreter::visit(ast::expr::literal &expr) {
     return expr.value;
 }
 
-scan::literal interpreter::visit(ast::unary &expr) {
+scan::literal interpreter::visit(ast::expr::unary &expr) {
     const auto right = evaluate(expr.expr);
 
     switch (expr.oper.type) {
@@ -45,7 +45,7 @@ scan::literal interpreter::visit(ast::unary &expr) {
 }
 
 
-scan::literal interpreter::evaluate(const std::unique_ptr<ast::expression> &expr) {
+scan::literal interpreter::evaluate(const std::unique_ptr<ast::expr::expression> &expr) {
     return expr->accept(*this);
 }
 
