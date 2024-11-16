@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "expression.hpp"
+#include "../ast/expression.hpp"
 #include "../io/reporter.hpp"
 #include "../scanner/token.hpp"
 
@@ -12,7 +12,7 @@ namespace cfp::parse {
     class parser {
     public:
         parser(std::vector<scan::token>& tokens, const io::reporter& reporter);
-        std::unique_ptr<expression> parse();
+        std::unique_ptr<ast::expression> parse();
 
         class parse_error final : public std::runtime_error {
         public:
@@ -20,13 +20,13 @@ namespace cfp::parse {
         };
 
     private:
-        std::unique_ptr<expression> expr();
-        std::unique_ptr<expression> equality();
-        std::unique_ptr<expression> comparison();
-        std::unique_ptr<expression> term();
-        std::unique_ptr<expression> factor();
-        std::unique_ptr<expression> unary();
-        std::unique_ptr<expression> primary();
+        std::unique_ptr<ast::expression> expr();
+        std::unique_ptr<ast::expression> equality();
+        std::unique_ptr<ast::expression> comparison();
+        std::unique_ptr<ast::expression> term();
+        std::unique_ptr<ast::expression> factor();
+        std::unique_ptr<ast::expression> unary();
+        std::unique_ptr<ast::expression> primary();
 
         void synchronize();
 

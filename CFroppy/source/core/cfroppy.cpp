@@ -1,8 +1,7 @@
 #include "cfroppy.hpp"
 #include <fstream>
 #include <iostream>
-
-#include "../interpreting/interpreter .hpp"
+#include "../interpreting/interpreter.hpp"
 #include "../parsing/parser.hpp"
 #include "../scanner/scanner.hpp"
 
