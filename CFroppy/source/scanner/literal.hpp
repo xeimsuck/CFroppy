@@ -50,7 +50,7 @@ namespace cfp::scan {
 
         [[nodiscard]] std::string stringify() const;
 
-        //equality
+        // equality
         bool operator==(const literal & rhs) const;
         bool operator!=(const literal & rhs) const;
 

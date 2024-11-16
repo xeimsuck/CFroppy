@@ -70,27 +70,82 @@ std::string literal::stringify() const {
 
 
 bool literal::operator==(const literal &rhs) const {
-    return value==rhs.value;
+    if(has<integer>()) {
+        if(rhs.has<integer>()) return getInteger() == rhs.getInteger();
+        if(rhs.has<decimal>()) return static_cast<decimal>(getInteger()) == rhs.getDecimal();
+    } else if(has<decimal>()) {
+        if(rhs.has<integer>()) return getDecimal() == static_cast<decimal>(rhs.getInteger());
+        if(rhs.has<decimal>()) return getDecimal() == rhs.getDecimal();
+    } else if(has<string>() && rhs.has<string>()) {
+        return getString()==rhs.getString();
+    } else if(has<boolean>() && rhs.has<boolean>()) {
+        return getBoolean()==rhs.getBoolean();
+    }
+    return has<nil>()&&rhs.has<nil>();
 }
 
 bool literal::operator!=(const literal &rhs) const {
-    return value!=rhs.value;
+    return !(*this==rhs);
 }
 
 bool literal::operator>(const literal &rhs) const {
-    return value>rhs.value;
+    if(has<integer>()) {
+        if(rhs.has<integer>()) return getInteger() > rhs.getInteger();
+        if(rhs.has<decimal>()) return static_cast<decimal>(getInteger()) > rhs.getDecimal();
+    } else if(has<decimal>()) {
+        if(rhs.has<integer>()) return getDecimal() > static_cast<decimal>(rhs.getInteger());
+        if(rhs.has<decimal>()) return getDecimal() > rhs.getDecimal();
+    } else if(has<string>() && rhs.has<string>()) {
+        return getString() > rhs.getString();
+    } else if(has<boolean>() && rhs.has<boolean>()) {
+        return getBoolean() > rhs.getBoolean();
+    }
+    return false;
 }
 
 bool literal::operator>=(const literal &rhs) const {
-    return value>=rhs.value;
+    if(has<integer>()) {
+        if(rhs.has<integer>()) return getInteger() >= rhs.getInteger();
+        if(rhs.has<decimal>()) return static_cast<decimal>(getInteger()) >= rhs.getDecimal();
+    } else if(has<decimal>()) {
+        if(rhs.has<integer>()) return getDecimal() >= static_cast<decimal>(rhs.getInteger());
+        if(rhs.has<decimal>()) return getDecimal() >= rhs.getDecimal();
+    } else if(has<string>() && rhs.has<string>()) {
+        return getString() >= rhs.getString();
+    } else if(has<boolean>() && rhs.has<boolean>()) {
+        return getBoolean() >= rhs.getBoolean();
+    }
+    return has<nil>()&&rhs.has<nil>();
 }
 
 bool literal::operator<(const literal &rhs) const {
-    return value<rhs.value;
+    if(has<integer>()) {
+        if(rhs.has<integer>()) return getInteger() < rhs.getInteger();
+        if(rhs.has<decimal>()) return static_cast<decimal>(getInteger()) < rhs.getDecimal();
+    } else if(has<decimal>()) {
+        if(rhs.has<integer>()) return getDecimal() < static_cast<decimal>(rhs.getInteger());
+        if(rhs.has<decimal>()) return getDecimal() < rhs.getDecimal();
+    } else if(has<string>() && rhs.has<string>()) {
+        return getString() < rhs.getString();
+    } else if(has<boolean>() && rhs.has<boolean>()) {
+        return getBoolean() < rhs.getBoolean();
+    }
+    return false;
 }
 
 bool literal::operator<=(const literal &rhs) const {
-    return value<=rhs.value;
+    if(has<integer>()) {
+        if(rhs.has<integer>()) return getInteger() <= rhs.getInteger();
+        if(rhs.has<decimal>()) return static_cast<decimal>(getInteger()) <= rhs.getDecimal();
+    } else if(has<decimal>()) {
+        if(rhs.has<integer>()) return getDecimal() <= static_cast<decimal>(rhs.getInteger());
+        if(rhs.has<decimal>()) return getDecimal() <= rhs.getDecimal();
+    } else if(has<string>() && rhs.has<string>()) {
+        return getString() <= rhs.getString();
+    } else if(has<boolean>() && rhs.has<boolean>()) {
+        return getBoolean() <= rhs.getBoolean();
+    }
+    return has<nil>()&&rhs.has<nil>();
 }
 
 literal literal::operator-() const {
