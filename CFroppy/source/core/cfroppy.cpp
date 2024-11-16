@@ -52,7 +52,7 @@ int cfroppy::execute(const std::string &source) {
     const auto stmts = parser.parse();
 
     if(!reporter.getHadError()) {
-        interpreting::interpreter interpreter;
+        interpreting::interpreter interpreter(reporter);
         interpreter.interpret(stmts);
     }
 

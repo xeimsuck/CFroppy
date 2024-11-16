@@ -17,9 +17,13 @@ void reporter::warning(const int line, const std::string& where, const std::stri
 }
 
 void reporter::error(const int line, const std::string& where, const std::string &msg) const {
-    hadError = true;
     report(line, messageType::ERROR, where, msg);
 }
+
+void reporter::error(const interpreting::runtime_error &err) const {
+    message(std::format("[runtime] Error: {}\n", err.what()), true);
+}
+
 
 void reporter::message(const std::string &msg, const bool error) const {
     if(error) {
@@ -30,7 +34,7 @@ void reporter::message(const std::string &msg, const bool error) const {
 }
 
 void reporter::report(const int line, const messageType &type, const std::string& where, const std::string &msg) const {
-    message(std::format("[line {}] Error{}: {}\n", line, where, msg), type!=messageType::INFO);
+    message(std::format("[line {}] Error{}: {}\n", line, where, msg), type==messageType::ERROR);
 }
 
 bool reporter::getHadError() const {

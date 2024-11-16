@@ -1,14 +1,23 @@
 #include "interpreter.hpp"
-#include "iostream"
+#include <iostream>
+#include "runtimeError.hpp"
 
 using namespace cfp;
 using namespace cfp::interpreting;
 using namespace scan::types;
 using enum scan::token::tokenType;
 
+interpreter::interpreter(const io::reporter& reporter) : reporter(reporter) {
+}
+
+
 void interpreter::interpret(const std::vector<std::unique_ptr<ast::stmt::statement>> &stmts) {
-    for(decltype(auto) stmt : stmts) {
-        execute(stmt);
+    try {
+        for(decltype(auto) stmt : stmts) {
+            execute(stmt);
+        }
+    } catch (const runtime_error& ex) {
+        reporter.error(ex);
     }
 }
 
