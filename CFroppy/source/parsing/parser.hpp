@@ -43,6 +43,9 @@ namespace cfp::parse {
         [[nodiscard]] scan::token& peek() const;
         [[nodiscard]] scan::token& previous() const;
 
+        /*!
+        @brief advance if current type of token matches with at least one of expected
+         */
         template<std::same_as<scan::token::tokenType>... T>
         bool match(T... types) {
             for(decltype(auto) type : {types...}) {

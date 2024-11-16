@@ -3,7 +3,17 @@
 #include <string>
 #include "../interpreting/runtimeError.hpp"
 
+/*!
+    @file
+    @author Xeim
+    @version 1.0
+    @data 16.11.24
+ */
+
 namespace cfp::io {
+    /*!
+    @brief represent input/output interface
+     */
     class reporter {
     public:
         explicit reporter(std::ostream& out = std::cout,

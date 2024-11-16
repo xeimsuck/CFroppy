@@ -77,7 +77,7 @@ int cfroppy::executeFile(const std::string &path) {
         if(!source.empty()) source.push_back('\n');
         source+=line;
     }
-    return execute(source);;
+    return execute(source);
 }
 
 

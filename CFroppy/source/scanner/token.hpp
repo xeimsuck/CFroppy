@@ -3,7 +3,17 @@
 #include <string>
 #include "literal.hpp"
 
+/*!
+    @file
+    @author Xeim
+    @version 1.0
+    @data 16.11.24
+ */
+
 namespace cfp::scan {
+    /*!
+    @brief represent token
+     */
     struct token {
         enum class tokenType {
             // Single-character tokens.

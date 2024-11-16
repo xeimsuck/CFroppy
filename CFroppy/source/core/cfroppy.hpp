@@ -2,7 +2,18 @@
 #include <string>
 #include "../io/reporter.hpp"
 
+/*!
+    @file
+    @brief Contains main class that run translation
+    @author Xeim
+    @version 1.0
+    @data 16.11.24
+ */
+
 namespace cfp::core {
+    /*!
+    @brief combines all translation phases
+     */
     class cfroppy {
     public:
         cfroppy(const cfroppy&) = delete;

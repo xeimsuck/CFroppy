@@ -4,7 +4,17 @@
 #include "token.hpp"
 #include "../io/reporter.hpp"
 
+/*!
+    @file
+    @author Xeim
+    @version 1.0
+    @data 16.11.24
+ */
+
 namespace cfp::scan {
+    /*!
+    @brief translate source to the flow of tokens
+     */
     class scanner {
     public:
         explicit scanner(std::string source, const io::reporter& reporter);

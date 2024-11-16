@@ -2,6 +2,14 @@
 #include <string>
 #include <variant>
 
+/*!
+    @file
+    @author Xeim
+    @version 1.0
+    @data 16.11.24
+ */
+
+
 namespace cfp::scan {
     namespace types {
         using nil = std::monostate;
@@ -12,6 +20,10 @@ namespace cfp::scan {
 
         inline constexpr nil nil_v;
     }
+
+    /*!
+    @brief represent literal
+     */
     class literal {
     public:
         literal(types::nil = types::nil_v);

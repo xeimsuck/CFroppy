@@ -262,6 +262,10 @@ std::unique_ptr<stmt::print> parser::printStatement() {
     return std::make_unique<stmt::print>(std::move(expr));
 }
 
+/*!
+ * @brief parse expression statement
+ * @return expression statement
+ */
 std::unique_ptr<stmt::expression> parser::expressionStatement() {
     decltype(auto) expr = this->expr();
     consume(SEMICOLON, "Expected ; after expression.");
