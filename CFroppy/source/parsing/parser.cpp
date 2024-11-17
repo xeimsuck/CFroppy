@@ -127,7 +127,7 @@ std::unique_ptr<expr::expression> parser::assignment() {
 			return std::make_unique<expr::assign>(var->name, std::move(value));
 		}
 
-		error(equals, "Invalid assignment target.");
+		throw error(equals, "Invalid assignment target.");
 	}
 
 	return expr;
