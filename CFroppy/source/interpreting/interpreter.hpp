@@ -3,6 +3,7 @@
 #include "../ast/expression.hpp"
 #include "../ast/statement.hpp"
 #include "../io/reporter.hpp"
+#include "environment.hpp"
 
 /*!
     @file
@@ -29,9 +30,11 @@ namespace cfp::interpreting {
         scan::literal visit(ast::expr::literal &expr) override;
         scan::literal visit(ast::expr::grouping &expr) override;
         scan::literal visit(ast::expr::binary &expr) override;
+        scan::literal visit(ast::expr::variable &expr) override;
 
         void visit(ast::stmt::expression &stmt) override;
         void visit(ast::stmt::print &stmt) override;
+        void visit(ast::stmt::var &stmt) override;
 
     private:
         void execute(const std::unique_ptr<ast::stmt::statement>& stmt);
@@ -39,5 +42,6 @@ namespace cfp::interpreting {
         scan::literal evaluate(const std::unique_ptr<ast::expr::expression>& expr);;
 
         const io::reporter& reporter;
+        environment environment_;
     };
 }

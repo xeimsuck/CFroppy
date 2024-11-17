@@ -28,7 +28,7 @@ parser::parse_error::parse_error(const std::string &err) : runtime_error(err) {
 std::vector<std::unique_ptr<stmt::statement>> parser::parse() {
     std::vector<std::unique_ptr<stmt::statement>> statements;
     while (!isAtEnd()) {
-        statements.push_back(statement());
+        statements.push_back(declaration());
     }
     return statements;
 }
@@ -208,6 +208,10 @@ std::unique_ptr<expr::expression> parser::primary() {
         return std::make_unique<expr::literal>(previous().literal);
     }
 
+	if(match(IDENTIFIER)) {
+		return std::make_unique<expr::variable>(previous());
+	}
+
     if(match(LEFT_PAREN)) {
         auto expr = std::make_unique<expr::grouping>(this->expr());
         consume(RIGHT_PAREN, "Expect \')\' after expression.");
@@ -237,11 +241,47 @@ void parser::synchronize() {
             case PRINT:
             case RETURN:
               return;
-          default: continue;
+          default: break;
         }
+
         advance();
     }
 }
+
+
+/*!
+ * @brief parse current declaration
+ * @return declaration statement
+ */
+std::unique_ptr<stmt::statement> parser::declaration() {
+	try {
+		if(match(VAR)) {
+			return varDeclaration();
+		}
+		return statement();
+	} catch (const parse_error& ex) {
+		synchronize();
+		return nullptr;
+	}
+}
+
+/*!
+ * @brief parse variable declaration
+ * @return variable declaration statement
+ */
+std::unique_ptr<stmt::var> parser::varDeclaration() {
+	token name = consume(IDENTIFIER, "Expect variable name.");
+
+	std::unique_ptr<expr::expression> initializer;
+	if(match(EQUAL)) {
+		initializer = expr();
+	}
+
+	consume(SEMICOLON, "Expect ; after variable declaration.");
+
+	return std::make_unique<stmt::var>(std::move(name), std::move(initializer));
+}
+
 
 /*!
  * @brief parse a current statement
@@ -258,7 +298,7 @@ std::unique_ptr<stmt::statement> parser::statement() {
  */
 std::unique_ptr<stmt::print> parser::printStatement() {
     decltype(auto) expr = this->expr();
-    consume(SEMICOLON, "Expected ; after expression.");
+    consume(SEMICOLON, "Expect ; after expression.");
     return std::make_unique<stmt::print>(std::move(expr));
 }
 
@@ -268,6 +308,6 @@ std::unique_ptr<stmt::print> parser::printStatement() {
  */
 std::unique_ptr<stmt::expression> parser::expressionStatement() {
     decltype(auto) expr = this->expr();
-    consume(SEMICOLON, "Expected ; after expression.");
+    consume(SEMICOLON, "Expect ; after expression.");
     return std::make_unique<stmt::expression>(std::move(expr));
 }

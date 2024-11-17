@@ -38,3 +38,19 @@ print::print(std::unique_ptr<expr::expression> &&expr) : expr(std::move(expr)) {
 void print::accept(stmtVisitor &visitor) {
     visitor.visit(*this);
 }
+
+
+/*!
+ * @param name variable
+ * @param initializer value
+ */
+var::var(scan::token name, std::unique_ptr<expr::expression> &&initializer)
+                       : name(std::move(name)), initializer(std::move(initializer)){
+}
+
+/*!
+ * @param visitor visitor
+ */
+void var::accept(stmtVisitor &visitor) {
+    visitor.visit(*this);
+}

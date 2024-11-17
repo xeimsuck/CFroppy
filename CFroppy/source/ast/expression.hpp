@@ -15,7 +15,8 @@ namespace cfp::ast::expr {
     struct binary;
     struct grouping;
     struct literal;
-    struct unary;
+	struct unary;
+	struct variable;
 
 
     /*!
@@ -31,6 +32,7 @@ namespace cfp::ast::expr {
         virtual scan::literal visit(grouping& expr) = 0;
         virtual scan::literal visit(literal& expr) = 0;
         virtual scan::literal visit(unary& expr) = 0;
+        virtual scan::literal visit(variable& expr) = 0;
     };
 
 
@@ -92,5 +94,17 @@ namespace cfp::ast::expr {
 
         std::unique_ptr<expression> expr;
         scan::token oper;
+    };
+
+
+    /*!
+    @brief represent variable expression
+     */
+    struct variable final : expression {
+        explicit variable(scan::token name);
+
+        scan::literal accept(exprVisitor &visitor) override;
+
+        scan::token name;
     };
 }

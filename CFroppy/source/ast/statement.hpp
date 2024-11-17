@@ -14,7 +14,8 @@
 namespace cfp::ast::stmt {
     struct statement;
     struct expression;
-    struct print;
+	struct print;
+	struct var;
 
 
     /*!
@@ -28,6 +29,7 @@ namespace cfp::ast::stmt {
 
         virtual void visit(expression& stmt) = 0;
         virtual void visit(print& stmt) = 0;
+        virtual void visit(var& stmt) = 0;
     };
 
 
@@ -62,5 +64,18 @@ namespace cfp::ast::stmt {
         void accept(stmtVisitor &visitor) override;
 
         std::unique_ptr<expr::expression> expr;
+    };
+
+
+    /*!
+    @brief represent var initialization
+     */
+    struct var final : statement {
+        explicit var(scan::token name, std::unique_ptr<expr::expression>&& initializer);
+
+        void accept(stmtVisitor &visitor) override;
+
+        scan::token name;
+        std::unique_ptr<expr::expression> initializer;
     };
 }

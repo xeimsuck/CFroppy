@@ -89,6 +89,14 @@ scan::literal interpreter::visit(ast::expr::unary &expr) {
 }
 
 /*!
+ * @brief evaluate variable expression
+ */
+scan::literal interpreter::visit(ast::expr::variable &expr) {
+	return environment_.get(expr.name.lexeme);
+}
+
+
+/*!
  * @brief evaluate expression statement
  */
 void interpreter::visit(ast::stmt::expression &stmt) {
@@ -104,8 +112,17 @@ void interpreter::visit(ast::stmt::print &stmt) {
 }
 
 /*!
+ * @param stmt evaluate variable statement
+ */
+void interpreter::visit(ast::stmt::var &stmt) {
+	environment_.define(stmt.name.lexeme, evaluate(stmt.initializer));
+}
+
+
+/*!
  * @brief evaluate expression
  */
 scan::literal interpreter::evaluate(const std::unique_ptr<ast::expr::expression> &expr) {
+	if(!expr) return scan::literal{}; // return nil
     return expr->accept(*this);
 }

@@ -76,3 +76,18 @@ unary::unary(std::unique_ptr<expression>&& expr, scan::token oper) : expr(std::m
 scan::literal unary::accept(exprVisitor &visitor) {
     return visitor.visit(*this);
 }
+
+
+/*!
+ * @param name variable name
+ */
+variable::variable(scan::token name) : name(std::move(name)) {
+}
+
+/*!
+ * @param visitor visitor
+ * @return computed literal
+ */
+scan::literal variable::accept(exprVisitor &visitor) {
+    return visitor.visit(*this);
+}
