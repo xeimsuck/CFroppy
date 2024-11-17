@@ -18,8 +18,10 @@ namespace cfp::interpreting {
 	public:
 		void define(const std::string& name, scan::literal value);
 		void undefine(const std::string& name);
+		scan::literal assign(const std::string& name, scan::literal value);
 		scan::literal get(const std::string& name);
 	private:
+		scan::literal& consume(const std::string& name);
 		std::unordered_map<std::string, scan::literal> values;
 	};
 }

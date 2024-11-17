@@ -105,16 +105,36 @@ token &parser::previous() const {
 
 
 /*!
- * @brief check expr productions
+ * @brief evaluate expr productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::expr() {
-    return equality();
+    return assignment();
 }
 
+/*!
+ * @brief evaluate assignment production
+ * @return expression
+ */
+std::unique_ptr<expr::expression> parser::assignment() {
+	auto expr = equality();
+
+	if(match(EQUAL)) {
+		decltype(auto) equals = previous();
+		auto value = this->expr();
+
+		if(const auto var = dynamic_cast<expr::variable*>(expr.get())) {
+			return std::make_unique<expr::assign>(var->name, std::move(value));
+		}
+
+		error(equals, "Invalid assignment target.");
+	}
+
+	return expr;
+}
 
 /*!
- * @brief check equality productions
+ * @brief evaluate equality productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::equality() {
@@ -131,7 +151,7 @@ std::unique_ptr<expr::expression> parser::equality() {
 
 
 /*!
- * @brief check comparision productions
+ * @brief evaluate comparison productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::comparison() {
@@ -148,7 +168,7 @@ std::unique_ptr<expr::expression> parser::comparison() {
 
 
 /*!
- * @brief check term productions
+ * @brief evaluate term productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::term() {
@@ -165,7 +185,7 @@ std::unique_ptr<expr::expression> parser::term() {
 
 
 /*!
- * @brief check factor productions
+ * @brief evaluate factor productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::factor() {
@@ -182,7 +202,7 @@ std::unique_ptr<expr::expression> parser::factor() {
 
 
 /*!
- * @brief check unary productions
+ * @brief evaluate unary productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::unary() {
@@ -196,7 +216,7 @@ std::unique_ptr<expr::expression> parser::unary() {
 
 
 /*!
- * @brief check primary productions
+ * @brief evaluate primary productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::primary() {

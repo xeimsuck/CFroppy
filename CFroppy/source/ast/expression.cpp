@@ -91,3 +91,20 @@ variable::variable(scan::token name) : name(std::move(name)) {
 scan::literal variable::accept(exprVisitor &visitor) {
     return visitor.visit(*this);
 }
+
+
+/*!
+ * @param name variable name
+ * @param value new value
+ */
+assign::assign(scan::token name, std::unique_ptr<expression> &&value)
+                  : value(std::move(value)), name(std::move(name)) {
+}
+
+/*!
+ * @param visitor visitor
+ * @return computed literal
+ */
+scan::literal assign::accept(exprVisitor &visitor) {
+    return visitor.visit(*this);
+}

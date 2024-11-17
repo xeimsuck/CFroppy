@@ -95,6 +95,14 @@ scan::literal interpreter::visit(ast::expr::variable &expr) {
 	return environment_.get(expr.name.lexeme);
 }
 
+/*!
+ * @brief evaluate assign expression
+ */
+scan::literal interpreter::visit(ast::expr::assign &expr) {
+	return environment_.assign(expr.name.lexeme, evaluate(expr.value));
+}
+
+
 
 /*!
  * @brief evaluate expression statement

@@ -21,6 +21,7 @@ namespace cfp::parse {
 
     private:
         std::unique_ptr<ast::expr::expression> expr();
+        std::unique_ptr<ast::expr::expression> assignment();
         std::unique_ptr<ast::expr::expression> equality();
         std::unique_ptr<ast::expr::expression> comparison();
         std::unique_ptr<ast::expr::expression> term();

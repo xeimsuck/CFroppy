@@ -31,6 +31,7 @@ namespace cfp::interpreting {
         scan::literal visit(ast::expr::grouping &expr) override;
         scan::literal visit(ast::expr::binary &expr) override;
         scan::literal visit(ast::expr::variable &expr) override;
+        scan::literal visit(ast::expr::assign &expr) override;
 
         void visit(ast::stmt::expression &stmt) override;
         void visit(ast::stmt::print &stmt) override;

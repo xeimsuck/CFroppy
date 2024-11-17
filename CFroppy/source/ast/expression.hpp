@@ -17,6 +17,7 @@ namespace cfp::ast::expr {
     struct literal;
 	struct unary;
 	struct variable;
+	struct assign;
 
 
     /*!
@@ -33,6 +34,7 @@ namespace cfp::ast::expr {
         virtual scan::literal visit(literal& expr) = 0;
         virtual scan::literal visit(unary& expr) = 0;
         virtual scan::literal visit(variable& expr) = 0;
+        virtual scan::literal visit(assign& expr) = 0;
     };
 
 
@@ -107,4 +109,17 @@ namespace cfp::ast::expr {
 
         scan::token name;
     };
+
+
+	/*!
+	@brief represent assign expression
+	 */
+	struct assign final : expression {
+		explicit assign(scan::token name, std::unique_ptr<expression>&& value);
+
+		scan::literal accept(exprVisitor &visitor) override;
+
+		std::unique_ptr<expression> value;
+		scan::token name;
+	};
 }
