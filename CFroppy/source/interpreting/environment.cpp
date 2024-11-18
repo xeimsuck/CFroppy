@@ -4,6 +4,36 @@
 using namespace cfp;
 using namespace cfp::interpreting;
 
+
+/*!
+ * @param enclosing enclosing environment
+ */
+environment::environment(environment *enclosing) : enclosing(enclosing) {
+}
+
+
+/*!
+ * @brief move-constructor
+ */
+environment::environment(environment &&env) noexcept {
+	enclosing = env.enclosing;
+	env.enclosing = nullptr;
+	env.values = std::move(env.values);
+}
+
+
+/*!
+ * @brief move-assignment
+ */
+environment &environment::operator=(environment &&env) noexcept {
+	if(&env==this) return *this;
+	enclosing = env.enclosing;
+	env.enclosing = nullptr;
+	env.values = std::move(env.values);
+	return *this;
+}
+
+
 /*!
  * @brief define a new variable
  * @param name variable name
@@ -16,6 +46,7 @@ void environment::define(const std::string &name, scan::literal value) {
 	values[name] = std::move(value);
 }
 
+
 /*!
  * @brief undefine variable
  * @param name variable name
@@ -23,6 +54,7 @@ void environment::define(const std::string &name, scan::literal value) {
 void environment::undefine(const std::string &name) {
 	values.erase(name);
 }
+
 
 /*!
  * @brief assign a value to a variable
@@ -51,8 +83,8 @@ scan::literal environment::get(const std::string &name) {
  * @return variable value
  */
 scan::literal &environment::consume(const std::string &name) {
-	if(!values.contains(name)) {
-		throw runtime_error(std::format("Undefined variable '{}'.", name));
-	}
-	return values[name];
+	if(values.contains(name)) return values[name];
+	if(enclosing) return enclosing->consume(name);
+
+	throw runtime_error(std::format("Undefined variable '{}'.", name));
 }

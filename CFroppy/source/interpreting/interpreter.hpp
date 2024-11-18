@@ -36,13 +36,15 @@ namespace cfp::interpreting {
         void visit(ast::stmt::expression &stmt) override;
         void visit(ast::stmt::print &stmt) override;
         void visit(ast::stmt::var &stmt) override;
+        void visit(ast::stmt::block &stmt) override;
 
     private:
         void execute(const std::unique_ptr<ast::stmt::statement>& stmt);
+        void executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::unique_ptr<environment>&& env);
 
         scan::literal evaluate(const std::unique_ptr<ast::expr::expression>& expr);;
 
         const io::reporter& reporter;
-        environment environment_;
+        std::unique_ptr<environment> env;
     };
 }

@@ -285,6 +285,7 @@ std::unique_ptr<stmt::statement> parser::declaration() {
 	}
 }
 
+
 /*!
  * @brief parse variable declaration
  * @return variable declaration statement
@@ -304,13 +305,33 @@ std::unique_ptr<stmt::var> parser::varDeclaration() {
 
 
 /*!
+ * @brief parse a current block (lexical scope)
+ * @return block
+ */
+std::unique_ptr<stmt::block> parser::block() {
+	std::vector<std::unique_ptr<stmt::statement>> statements;
+
+	while (!check(RIGHT_BRACE) && !isAtEnd()) {
+		statements.push_back(declaration());
+	}
+
+	consume(RIGHT_BRACE, "Expect '}' after block.");
+
+	return std::make_unique<stmt::block>(std::move(statements));
+}
+
+
+
+/*!
  * @brief parse a current statement
  * @return statement
  */
 std::unique_ptr<stmt::statement> parser::statement() {
     if(match(PRINT)) return printStatement();
+	if(match(LEFT_BRACE)) return block();
     return expressionStatement();
 }
+
 
 /*!
  * @brief parse print statement

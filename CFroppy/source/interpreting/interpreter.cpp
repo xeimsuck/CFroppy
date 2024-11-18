@@ -1,5 +1,7 @@
 #include "interpreter.hpp"
 #include <iostream>
+#include <bits/ranges_algo.h>
+
 #include "runtimeError.hpp"
 
 using namespace cfp;
@@ -10,7 +12,7 @@ using enum scan::token::tokenType;
 /*!
  * @param reporter reporter
  */
-interpreter::interpreter(const io::reporter& reporter) : reporter(reporter) {
+interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env(std::make_unique<environment>()) {
 }
 
 /*!
@@ -34,6 +36,23 @@ void interpreter::interpret(const std::vector<std::unique_ptr<ast::stmt::stateme
 void interpreter::execute(const std::unique_ptr<ast::stmt::statement> &stmt) {
     stmt->accept(*this);
 }
+
+
+/*!
+ * @brief execute block of statements
+ * @param stmts statements
+ * @param env environment
+ */
+void interpreter::executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::unique_ptr<environment>&& newEnv) {
+	std::swap(env, newEnv);
+
+	std::ranges::for_each(stmts, [this](auto&& stmt) {
+		execute(stmt);
+	});
+
+	std::swap(env, newEnv);
+}
+
 
 /*!
  * @brief evaluate binary expressions
@@ -92,14 +111,14 @@ scan::literal interpreter::visit(ast::expr::unary &expr) {
  * @brief evaluate variable expression
  */
 scan::literal interpreter::visit(ast::expr::variable &expr) {
-	return environment_.get(expr.name.lexeme);
+	return env->get(expr.name.lexeme);
 }
 
 /*!
  * @brief evaluate assign expression
  */
 scan::literal interpreter::visit(ast::expr::assign &expr) {
-	return environment_.assign(expr.name.lexeme, evaluate(expr.value));
+	return env->assign(expr.name.lexeme, evaluate(expr.value));
 }
 
 
@@ -123,7 +142,15 @@ void interpreter::visit(ast::stmt::print &stmt) {
  * @param stmt evaluate variable statement
  */
 void interpreter::visit(ast::stmt::var &stmt) {
-	environment_.define(stmt.name.lexeme, evaluate(stmt.initializer));
+	env->define(stmt.name.lexeme, evaluate(stmt.initializer));
+}
+
+
+/*!
+ * @param stmt evaluate block statements
+ */
+void interpreter::visit(ast::stmt::block &stmt) {
+	executeBlock(stmt.statements, std::make_unique<environment>(env.get()));
 }
 
 

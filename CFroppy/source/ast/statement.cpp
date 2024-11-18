@@ -54,3 +54,17 @@ var::var(scan::token name, std::unique_ptr<expr::expression> &&initializer)
 void var::accept(stmtVisitor &visitor) {
     visitor.visit(*this);
 }
+
+
+/*!
+ * @param statements block statements
+ */
+block::block(std::vector<std::unique_ptr<statement>> statements) : statements(std::move(statements)){
+}
+
+/*!
+ * @param visitor visitor
+ */
+void block::accept(stmtVisitor &visitor) {
+    visitor.visit(*this);
+}

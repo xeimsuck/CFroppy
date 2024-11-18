@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "expression.hpp"
 #include "../scanner/token.hpp"
 
@@ -16,6 +17,7 @@ namespace cfp::ast::stmt {
     struct expression;
 	struct print;
 	struct var;
+	struct block;
 
 
     /*!
@@ -30,6 +32,7 @@ namespace cfp::ast::stmt {
         virtual void visit(expression& stmt) = 0;
         virtual void visit(print& stmt) = 0;
         virtual void visit(var& stmt) = 0;
+        virtual void visit(block& stmt) = 0;
     };
 
 
@@ -78,4 +81,16 @@ namespace cfp::ast::stmt {
         scan::token name;
         std::unique_ptr<expr::expression> initializer;
     };
+
+
+	/*!
+	@brief represent lexical scope
+	 */
+	struct block final : statement {
+		explicit block(std::vector<std::unique_ptr<statement>> statements);
+
+		void accept(stmtVisitor &visitor) override;
+
+		std::vector<std::unique_ptr<statement>> statements;
+	};
 }

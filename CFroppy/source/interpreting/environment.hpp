@@ -16,12 +16,28 @@ namespace cfp::interpreting {
 	 */
 	class environment {
 	public:
+		explicit environment(environment* enclosing = nullptr);
+		environment(const environment&) = delete;
+		environment& operator=(const environment&) = delete;
+		environment(environment&& env) noexcept;
+		environment& operator=(environment&& env) noexcept;
+		~environment() = default;
+
+	private:
+		friend void swap(environment& lhs, environment& rhs) noexcept {
+			std::swap(lhs.values, rhs.values);
+			std::swap(lhs.enclosing, rhs.enclosing);
+		}
+
+	public:
 		void define(const std::string& name, scan::literal value);
 		void undefine(const std::string& name);
 		scan::literal assign(const std::string& name, scan::literal value);
 		scan::literal get(const std::string& name);
-	private:
+
+	public:
 		scan::literal& consume(const std::string& name);
 		std::unordered_map<std::string, scan::literal> values;
+		environment* enclosing = nullptr;
 	};
 }
