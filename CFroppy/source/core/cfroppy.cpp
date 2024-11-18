@@ -1,8 +1,6 @@
 #include "cfroppy.hpp"
 #include <fstream>
 #include <iostream>
-#include <thread>
-
 #include "../interpreting/interpreter.hpp"
 #include "../parsing/parser.hpp"
 #include "../scanner/scanner.hpp"
@@ -10,7 +8,6 @@
 using namespace cfp;
 using namespace cfp::core;
 using namespace cfp::scan;
-using namespace std::chrono_literals;
 
 /*!
  * @return Singleton froppy
@@ -96,8 +93,6 @@ int cfroppy::prompt() {
 
         execute(line);
         reporter.resetHadError();
-
-        std::this_thread::sleep_for(40ms);
     }
     return 0;
 }
