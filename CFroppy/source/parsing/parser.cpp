@@ -114,7 +114,7 @@ std::unique_ptr<expr::expression> parser::expr() {
 
 
 /*!
- * @brief parse assignment production
+ * @brief parse assignment productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::assignment() {
@@ -225,7 +225,7 @@ std::unique_ptr<expr::expression> parser::term() {
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::factor() {
-    decltype(auto) expr = unary();
+    decltype(auto) expr = binary_assignment();
 
     while (match(STAR, SLASH)) {
         decltype(auto) oper = previous();
@@ -234,6 +234,28 @@ std::unique_ptr<expr::expression> parser::factor() {
     }
 
     return expr;
+}
+
+
+/*!
+ * @brief parse binary assignment productions
+ * @return expression
+ */
+std::unique_ptr<expr::expression> parser::binary_assignment() {
+	auto expr = this->unary();
+
+	if(match(PLUS_EQUAL) || match(MINUS_EQUAL) || match(STAR_EQUAL) || match(SLASH_EQUAL)) {
+		auto equals= previous();
+		auto value = this->unary();
+
+		if(const auto var = dynamic_cast<expr::variable*>(expr.get())) {
+			return std::make_unique<expr::binary_assign>(var->name, std::move(value), std::move(equals));
+		}
+
+		throw error(equals, "Invalid assignment target.");
+	}
+
+	return expr;
 }
 
 
