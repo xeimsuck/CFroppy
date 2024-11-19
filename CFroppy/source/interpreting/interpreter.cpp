@@ -122,6 +122,23 @@ scan::literal interpreter::visit(ast::expr::assign &expr) {
 }
 
 
+/*!
+ * @brief evaluate logical expression
+ */
+scan::literal interpreter::visit(ast::expr::logical &expr) {
+	const auto left = evaluate(expr.left);
+
+	if(expr.oper.type==OR) {
+		if(static_cast<bool>(left)) return scan::literal{true};
+	} else if(expr.oper.type==AND) {
+		if(!static_cast<bool>(left)) return scan::literal{false};
+	}
+
+	return evaluate(expr.right);
+}
+
+
+
 
 /*!
  * @brief execute expression statement
@@ -130,6 +147,7 @@ void interpreter::visit(ast::stmt::expression &stmt) {
     evaluate(stmt.expr);
 }
 
+
 /*!
  * @brief execute print statement
  */
@@ -137,6 +155,7 @@ void interpreter::visit(ast::stmt::print &stmt) {
     const auto literal = evaluate(stmt.expr);
     std::cout << literal.stringify() << std::endl;
 }
+
 
 /*!
  * @param stmt execute variable statement

@@ -105,19 +105,20 @@ token &parser::previous() const {
 
 
 /*!
- * @brief evaluate expr productions
+ * @brief parse expr productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::expr() {
     return assignment();
 }
 
+
 /*!
- * @brief evaluate assignment production
+ * @brief parse assignment production
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::assignment() {
-	auto expr = equality();
+	auto expr = logical_or();
 
 	if(match(EQUAL)) {
 		decltype(auto) equals = previous();
@@ -133,8 +134,43 @@ std::unique_ptr<expr::expression> parser::assignment() {
 	return expr;
 }
 
+
 /*!
- * @brief evaluate equality productions
+ * @brief parse logical_or production
+ * @return expression
+ */
+std::unique_ptr<expr::expression> parser::logical_or() {
+	auto expr = logical_and();
+
+	if(match(OR)) {
+		const auto& oper = previous();
+		auto right = logical_and();
+		return std::make_unique<expr::logical>(std::move(expr), std::move(right), oper);
+	}
+
+	return expr;
+}
+
+
+/*!
+ * @brief parse logical_and production
+ * @return expression
+ */
+std::unique_ptr<expr::expression> parser::logical_and() {
+	auto expr = equality();
+
+	if(match(AND)) {
+		const auto& oper = previous();
+		auto right = equality();
+		return std::make_unique<expr::logical>(std::move(expr), std::move(right), oper);
+	}
+
+	return expr;
+}
+
+
+/*!
+ * @brief parse equality productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::equality() {
@@ -151,7 +187,7 @@ std::unique_ptr<expr::expression> parser::equality() {
 
 
 /*!
- * @brief evaluate comparison productions
+ * @brief parse comparison productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::comparison() {
@@ -168,7 +204,7 @@ std::unique_ptr<expr::expression> parser::comparison() {
 
 
 /*!
- * @brief evaluate term productions
+ * @brief parse term productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::term() {
@@ -185,7 +221,7 @@ std::unique_ptr<expr::expression> parser::term() {
 
 
 /*!
- * @brief evaluate factor productions
+ * @brief parse factor productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::factor() {
@@ -202,7 +238,7 @@ std::unique_ptr<expr::expression> parser::factor() {
 
 
 /*!
- * @brief evaluate unary productions
+ * @brief parse unary productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::unary() {
@@ -216,7 +252,7 @@ std::unique_ptr<expr::expression> parser::unary() {
 
 
 /*!
- * @brief evaluate primary productions
+ * @brief parse primary productions
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::primary() {
