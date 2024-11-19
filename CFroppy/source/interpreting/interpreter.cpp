@@ -158,7 +158,7 @@ void interpreter::visit(ast::stmt::print &stmt) {
 
 
 /*!
- * @param stmt execute variable statement
+ * @brief execute variable statement
  */
 void interpreter::visit(ast::stmt::var &stmt) {
 	env->define(stmt.name.lexeme, evaluate(stmt.initializer));
@@ -166,7 +166,7 @@ void interpreter::visit(ast::stmt::var &stmt) {
 
 
 /*!
- * @param stmt execute block of statements
+ * @brief execute block of statements
  */
 void interpreter::visit(ast::stmt::block &stmt) {
 	executeBlock(stmt.statements, std::make_unique<environment>(env.get()));
@@ -174,7 +174,7 @@ void interpreter::visit(ast::stmt::block &stmt) {
 
 
 /*!
- * @param stmt execute if-else statement
+ * @brief execute if-else statement
  */
 void interpreter::visit(ast::stmt::if_else &stmt) {
 	if(static_cast<bool>(evaluate(stmt.condition))) {
@@ -183,6 +183,17 @@ void interpreter::visit(ast::stmt::if_else &stmt) {
 		stmt.elseBranch->accept(*this);
 	}
 }
+
+
+/*!
+ * @brief execute while loop
+ */
+void interpreter::visit(ast::stmt::while_loop &stmt) {
+	while (evaluate(stmt.condition)) {
+		stmt.body->accept(*this);
+	}
+}
+
 
 
 /*!

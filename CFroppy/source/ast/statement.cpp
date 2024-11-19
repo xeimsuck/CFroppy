@@ -85,3 +85,19 @@ if_else::if_else(std::unique_ptr<expr::expression> &&cond, std::unique_ptr<state
 void if_else::accept(stmtVisitor &visitor) {
     visitor.visit(*this);
 }
+
+
+/*!
+ * @param condition conditional
+ * @param body execute body while conditional is truthy
+ */
+while_loop::while_loop(std::unique_ptr<expr::expression> &&condition, std::unique_ptr<statement> &&body)
+                        : condition(std::move(condition)), body(std::move(body)){
+}
+
+/*!
+ * @param visitor visitor
+ */
+void while_loop::accept(stmtVisitor &visitor) {
+    visitor.visit(*this);
+}

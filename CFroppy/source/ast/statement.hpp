@@ -19,10 +19,11 @@ namespace cfp::ast::stmt {
 	struct var;
 	struct block;
 	struct if_else;
+	struct while_loop;
 
 
     /*!
-    @brief realize visitor pattern for statenents
+    @brief realize visitor pattern for statements
      */
     class stmtVisitor {
     public:
@@ -35,6 +36,7 @@ namespace cfp::ast::stmt {
         virtual void visit(var& stmt) = 0;
         virtual void visit(block& stmt) = 0;
         virtual void visit(if_else& stmt) = 0;
+        virtual void visit(while_loop& stmt) = 0;
     };
 
 
@@ -109,5 +111,17 @@ namespace cfp::ast::stmt {
 		std::unique_ptr<expr::expression> condition;
 		std::unique_ptr<statement> ifBranch;
 		std::unique_ptr<statement> elseBranch;
+	};
+
+	/*!
+	@brief represent while loop
+	 */
+	struct while_loop final : statement {
+		while_loop(std::unique_ptr<expr::expression>&& condition, std::unique_ptr<statement>&& body);
+
+		void accept(stmtVisitor &visitor) override;
+
+		std::unique_ptr<expr::expression> condition;
+		std::unique_ptr<statement> body;
 	};
 }

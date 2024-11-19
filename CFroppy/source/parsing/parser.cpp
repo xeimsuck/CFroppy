@@ -340,6 +340,20 @@ std::unique_ptr<stmt::var> parser::varDeclaration() {
 }
 
 
+
+/*!
+ * @brief parse a current statement
+ * @return statement
+ */
+std::unique_ptr<stmt::statement> parser::statement() {
+    if(match(PRINT)) return printStatement();
+	if(match(LEFT_BRACE)) return block();
+	if(match(IF)) return ifStatement();
+	if(match(WHILE)) return whileStatement();
+    return expressionStatement();
+}
+
+
 /*!
  * @brief parse a current block (lexical scope)
  * @return block
@@ -357,21 +371,8 @@ std::unique_ptr<stmt::block> parser::block() {
 }
 
 
-
 /*!
- * @brief parse a current statement
- * @return statement
- */
-std::unique_ptr<stmt::statement> parser::statement() {
-    if(match(PRINT)) return printStatement();
-	if(match(LEFT_BRACE)) return block();
-	if(match(IF)) return ifStatement();
-    return expressionStatement();
-}
-
-
-/*!
- * @brief parse print statement
+ * @brief parse print
  * @return print statement
  */
 std::unique_ptr<stmt::print> parser::printStatement() {
@@ -381,7 +382,7 @@ std::unique_ptr<stmt::print> parser::printStatement() {
 }
 
 /*!
- * @brief parse expression statement
+ * @brief parse expression
  * @return expression statement
  */
 std::unique_ptr<stmt::expression> parser::expressionStatement() {
@@ -392,7 +393,7 @@ std::unique_ptr<stmt::expression> parser::expressionStatement() {
 
 
 /*!
- * @brief parse if-else statement
+ * @brief parse if-else
  * @return if-else statement
  */
 std::unique_ptr<stmt::if_else> parser::ifStatement() {
@@ -407,4 +408,19 @@ std::unique_ptr<stmt::if_else> parser::ifStatement() {
 	}
 
 	return std::make_unique<stmt::if_else>(std::move(conditional), std::move(ifBranch), std::move(elseBranch));
+}
+
+
+/*!
+ * @brief parse while loop
+ * @return while loop statement
+ */
+std::unique_ptr<stmt::while_loop> parser::whileStatement() {
+	consume(LEFT_PAREN, "Expect '(' after 'if'.");
+	auto conditional = expr();
+	consume(RIGHT_PAREN, "Expect ')' after 'if'.");
+
+	auto body = statement();
+
+	return std::make_unique<stmt::while_loop>(std::move(conditional), std::move(body));
 }
