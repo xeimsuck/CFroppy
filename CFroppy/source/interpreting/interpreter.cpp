@@ -124,14 +124,14 @@ scan::literal interpreter::visit(ast::expr::assign &expr) {
 
 
 /*!
- * @brief evaluate expression statement
+ * @brief execute expression statement
  */
 void interpreter::visit(ast::stmt::expression &stmt) {
     evaluate(stmt.expr);
 }
 
 /*!
- * @brief evaluate print statement
+ * @brief execute print statement
  */
 void interpreter::visit(ast::stmt::print &stmt) {
     const auto literal = evaluate(stmt.expr);
@@ -139,7 +139,7 @@ void interpreter::visit(ast::stmt::print &stmt) {
 }
 
 /*!
- * @param stmt evaluate variable statement
+ * @param stmt execute variable statement
  */
 void interpreter::visit(ast::stmt::var &stmt) {
 	env->define(stmt.name.lexeme, evaluate(stmt.initializer));
@@ -147,10 +147,22 @@ void interpreter::visit(ast::stmt::var &stmt) {
 
 
 /*!
- * @param stmt evaluate block statements
+ * @param stmt execute block of statements
  */
 void interpreter::visit(ast::stmt::block &stmt) {
 	executeBlock(stmt.statements, std::make_unique<environment>(env.get()));
+}
+
+
+/*!
+ * @param stmt execute if-else statement
+ */
+void interpreter::visit(ast::stmt::if_else &stmt) {
+	if(static_cast<bool>(evaluate(stmt.condition))) {
+		stmt.ifBranch->accept(*this);
+	} else if(stmt.elseBranch) {
+		stmt.elseBranch->accept(*this);
+	}
 }
 
 

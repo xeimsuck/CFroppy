@@ -18,6 +18,7 @@ namespace cfp::ast::stmt {
 	struct print;
 	struct var;
 	struct block;
+	struct if_else;
 
 
     /*!
@@ -33,6 +34,7 @@ namespace cfp::ast::stmt {
         virtual void visit(print& stmt) = 0;
         virtual void visit(var& stmt) = 0;
         virtual void visit(block& stmt) = 0;
+        virtual void visit(if_else& stmt) = 0;
     };
 
 
@@ -92,5 +94,20 @@ namespace cfp::ast::stmt {
 		void accept(stmtVisitor &visitor) override;
 
 		std::vector<std::unique_ptr<statement>> statements;
+	};
+
+
+	/*!
+	@brief represent if-else statement
+	 */
+	struct if_else final : statement {
+		if_else(std::unique_ptr<expr::expression>&& cond, std::unique_ptr<statement>&& ifBranch,
+				std::unique_ptr<statement>&& elseBranch);
+
+		void accept(stmtVisitor &visitor) override;
+
+		std::unique_ptr<expr::expression> condition;
+		std::unique_ptr<statement> ifBranch;
+		std::unique_ptr<statement> elseBranch;
 	};
 }

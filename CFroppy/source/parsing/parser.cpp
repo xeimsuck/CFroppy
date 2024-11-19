@@ -329,6 +329,7 @@ std::unique_ptr<stmt::block> parser::block() {
 std::unique_ptr<stmt::statement> parser::statement() {
     if(match(PRINT)) return printStatement();
 	if(match(LEFT_BRACE)) return block();
+	if(match(IF)) return ifStatement();
     return expressionStatement();
 }
 
@@ -351,4 +352,23 @@ std::unique_ptr<stmt::expression> parser::expressionStatement() {
     decltype(auto) expr = this->expr();
     consume(SEMICOLON, "Expect ; after expression.");
     return std::make_unique<stmt::expression>(std::move(expr));
+}
+
+
+/*!
+ * @brief parse if-else statement
+ * @return if-else statement
+ */
+std::unique_ptr<stmt::if_else> parser::ifStatement() {
+	consume(LEFT_PAREN, "Expect '(' after 'if'.");
+	auto conditional = expr();
+	consume(RIGHT_PAREN, "Expect ')' after 'if'.");
+
+	auto ifBranch = statement();
+	std::unique_ptr<stmt::statement> elseBranch = nullptr;
+	if(match(ELSE)) {
+		elseBranch = statement();
+	}
+
+	return std::make_unique<stmt::if_else>(std::move(conditional), std::move(ifBranch), std::move(elseBranch));
 }
