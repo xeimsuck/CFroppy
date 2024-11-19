@@ -351,6 +351,7 @@ std::unique_ptr<stmt::statement> parser::statement() {
 	if(match(IF)) return ifStatement();
 	if(match(WHILE)) return whileStatement();
 	if(match(FOR)) return forStatement();
+	if(match(BREAK)) return breakStatement();
     return expressionStatement();
 }
 
@@ -427,8 +428,8 @@ std::unique_ptr<stmt::loop> parser::whileStatement() {
 }
 
 /*!
- * @brief parse for loop
- * @return for loop statement
+ * @brief parse for-loop
+ * @return for-loop statement
  */
 std::unique_ptr<stmt::loop> parser::forStatement() {
 	consume(LEFT_PAREN, "Expect '(' after 'for'.");
@@ -452,4 +453,13 @@ std::unique_ptr<stmt::loop> parser::forStatement() {
 	auto body = statement();
 
 	return std::make_unique<stmt::loop>(std::move(initializer), std::move(conditional), std::move(increment), std::move(body));
+}
+
+
+/*!
+ * @brief parse 'break'
+ */
+std::unique_ptr<stmt::break_loop> parser::breakStatement() {
+	consume(SEMICOLON, "Expect ; after 'break'.");
+	return std::make_unique<stmt::break_loop>();
 }

@@ -105,3 +105,11 @@ loop::loop(std::unique_ptr<statement> &&initializer, std::unique_ptr<expr::expre
 void loop::accept(stmtVisitor &visitor) {
     visitor.visit(*this);
 }
+
+
+/*!
+ * @param visitor visitor
+ */
+void break_loop::accept(stmtVisitor &visitor) {
+    visitor.visit(*this);
+}

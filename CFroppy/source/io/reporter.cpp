@@ -37,9 +37,17 @@ void reporter::error(const int line, const std::string& where, const std::string
 /*!
  * @brief output runtime_error to the error stream
  */
-void reporter::error(const interpreting::runtime_error &err) const {
-    message(std::format("[runtime] Error: {}\n", err.what()), true);
+void reporter::runtime_error(const interpreting::runtime_error &err) const {
+    runtime_error(err.what());
 }
+
+/*!
+ * @brief output runtime_error to the error stream
+ */
+void reporter::runtime_error(const std::string& str) const {
+	message(std::format("[runtime] Error: {}\n", str), true);
+}
+
 
 /*!
  * @param msg a message is outputted

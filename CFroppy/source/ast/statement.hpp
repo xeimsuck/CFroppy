@@ -20,6 +20,7 @@ namespace cfp::ast::stmt {
 	struct block;
 	struct if_else;
 	struct loop;
+	struct break_loop;
 
 
     /*!
@@ -37,6 +38,7 @@ namespace cfp::ast::stmt {
         virtual void visit(block& stmt) = 0;
         virtual void visit(if_else& stmt) = 0;
         virtual void visit(loop& stmt) = 0;
+        virtual void visit(break_loop& stmt) = 0;
     };
 
 
@@ -126,5 +128,12 @@ namespace cfp::ast::stmt {
 		std::unique_ptr<expr::expression> increment;
 		std::unique_ptr<expr::expression> condition;
 		std::unique_ptr<statement> body;
+	};
+
+
+	struct break_loop final : statement{
+		break_loop() = default;
+
+		void accept(stmtVisitor &visitor) override;
 	};
 }

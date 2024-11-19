@@ -22,7 +22,8 @@ namespace cfp::io {
         void info(int line, const std::string& where, const std::string& msg) const;
         void warning(int line, const std::string& where, const std::string& msg) const;
         void error(int line, const std::string& where, const std::string& msg) const;
-        void error(const interpreting::runtime_error& err) const;
+        void runtime_error(const interpreting::runtime_error& err) const;
+        void runtime_error(const std::string& str) const;
         void message(const std::string& msg, bool error = false) const;
         bool getHadError() const;
         void resetHadError() const;

@@ -9,6 +9,8 @@ using namespace cfp::interpreting;
 using namespace scan::types;
 using enum scan::token::tokenType;
 
+struct break_throw {};
+
 /*!
  * @param reporter reporter
  */
@@ -24,8 +26,10 @@ void interpreter::interpret(const std::vector<std::unique_ptr<ast::stmt::stateme
         for(decltype(auto) stmt : stmts) {
             execute(stmt);
         }
+    } catch (break_throw) {
+	  reporter.runtime_error("'break' must be used in loop.");
     } catch (const runtime_error& ex) {
-        reporter.error(ex);
+        reporter.runtime_error(ex);
     }
 }
 
@@ -194,11 +198,21 @@ void interpreter::visit(ast::stmt::loop &stmt) {
 
 	if(stmt.initializer) stmt.initializer->accept(*this);
 	while (evaluate(stmt.condition)) {
-		stmt.body->accept(*this);
-		if(stmt.increment) evaluate(stmt.increment);
+		try {
+			stmt.body->accept(*this);
+			if(stmt.increment) evaluate(stmt.increment);
+		} catch (break_throw b) { break; }
 	}
 
 	std::swap(env, loopEnv);
+}
+
+
+/*!
+ * @brief break
+ */
+void interpreter::visit(ast::stmt::break_loop &stmt) {
+	throw break_throw{};
 }
 
 
