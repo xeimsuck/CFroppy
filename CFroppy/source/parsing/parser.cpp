@@ -350,6 +350,7 @@ std::unique_ptr<stmt::statement> parser::statement() {
 	if(match(LEFT_BRACE)) return block();
 	if(match(IF)) return ifStatement();
 	if(match(WHILE)) return whileStatement();
+	if(match(FOR)) return forStatement();
     return expressionStatement();
 }
 
@@ -415,12 +416,40 @@ std::unique_ptr<stmt::if_else> parser::ifStatement() {
  * @brief parse while loop
  * @return while loop statement
  */
-std::unique_ptr<stmt::while_loop> parser::whileStatement() {
-	consume(LEFT_PAREN, "Expect '(' after 'if'.");
+std::unique_ptr<stmt::loop> parser::whileStatement() {
+	consume(LEFT_PAREN, "Expect '(' after 'while'.");
 	auto conditional = expr();
-	consume(RIGHT_PAREN, "Expect ')' after 'if'.");
+	consume(RIGHT_PAREN, "Expect ')' after 'while'.");
 
 	auto body = statement();
 
-	return std::make_unique<stmt::while_loop>(std::move(conditional), std::move(body));
+	return std::make_unique<stmt::loop>(nullptr,std::move(conditional), nullptr, std::move(body));
+}
+
+/*!
+ * @brief parse for loop
+ * @return for loop statement
+ */
+std::unique_ptr<stmt::loop> parser::forStatement() {
+	consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+	std::unique_ptr<stmt::statement> initializer;
+	if(match(VAR)) initializer = varDeclaration();
+	else initializer = expressionStatement();
+
+	std::unique_ptr<expr::expression> conditional;
+	if(check(SEMICOLON)) conditional = std::make_unique<expr::literal>(literal{true});
+	else conditional = expr();
+	consume(SEMICOLON, "Expect ';' after conditional.");
+
+	std::unique_ptr<expr::expression> increment;
+	if(!check(RIGHT_PAREN)) {
+		increment = expr();
+	}
+
+	consume(RIGHT_PAREN, "Expect ')' after 'for'.");
+
+	auto body = statement();
+
+	return std::make_unique<stmt::loop>(std::move(initializer), std::move(conditional), std::move(increment), std::move(body));
 }

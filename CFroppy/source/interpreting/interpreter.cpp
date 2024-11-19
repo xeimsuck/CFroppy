@@ -188,10 +188,17 @@ void interpreter::visit(ast::stmt::if_else &stmt) {
 /*!
  * @brief execute while loop
  */
-void interpreter::visit(ast::stmt::while_loop &stmt) {
+void interpreter::visit(ast::stmt::loop &stmt) {
+	auto loopEnv = std::make_unique<environment>(env.get());
+	std::swap(env, loopEnv);
+
+	if(stmt.initializer) stmt.initializer->accept(*this);
 	while (evaluate(stmt.condition)) {
 		stmt.body->accept(*this);
+		if(stmt.increment) evaluate(stmt.increment);
 	}
+
+	std::swap(env, loopEnv);
 }
 
 

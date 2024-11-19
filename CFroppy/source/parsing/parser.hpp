@@ -38,7 +38,8 @@ namespace cfp::parse {
         std::unique_ptr<ast::stmt::print> printStatement();
         std::unique_ptr<ast::stmt::expression> expressionStatement();
         std::unique_ptr<ast::stmt::if_else> ifStatement();
-        std::unique_ptr<ast::stmt::while_loop> whileStatement();
+        std::unique_ptr<ast::stmt::loop> whileStatement();
+        std::unique_ptr<ast::stmt::loop> forStatement();
 
         void synchronize();
 

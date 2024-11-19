@@ -88,16 +88,20 @@ void if_else::accept(stmtVisitor &visitor) {
 
 
 /*!
- * @param condition conditional
- * @param body execute body while conditional is truthy
+ * @param initializer initializer (optional)
+ * @param condition conditional (optional)
+ * @param increment increment (optional)
+ * @param body loop body
  */
-while_loop::while_loop(std::unique_ptr<expr::expression> &&condition, std::unique_ptr<statement> &&body)
-                        : condition(std::move(condition)), body(std::move(body)){
+loop::loop(std::unique_ptr<statement> &&initializer, std::unique_ptr<expr::expression> &&condition,
+           std::unique_ptr<expr::expression> &&increment, std::unique_ptr<statement> &&body)
+     : initializer(std::move(initializer)), increment(std::move(increment)), condition(std::move(condition)), body(std::move(body)){
 }
+
 
 /*!
  * @param visitor visitor
  */
-void while_loop::accept(stmtVisitor &visitor) {
+void loop::accept(stmtVisitor &visitor) {
     visitor.visit(*this);
 }
