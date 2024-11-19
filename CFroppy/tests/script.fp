@@ -1,7 +1,7 @@
-var x = 1.5;
-var y = 3;
-{
-    var y = x+y;
-    print y;
+var x = 0;
+while (x < 5) {
+    x = x + 1;
+
+    if(x<3) print "x less than 3";
+    else print "x greater than or equal to 3";
 }
-print y;
