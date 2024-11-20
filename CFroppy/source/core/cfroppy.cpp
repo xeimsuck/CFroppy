@@ -27,7 +27,7 @@ cfroppy &cfroppy::init() {
  */
 int cfroppy::run(const int argc, char **argv) {
     if(argc>2) {
-        reporter.message("Usage: cfp [script]", true);
+        reporter.report("Usage: cfp [script]", true);
         return 1;
     }
     try {
@@ -68,7 +68,7 @@ int cfroppy::execute(const std::string &source) {
 int cfroppy::executeFile(const std::string &path) {
     std::ifstream file(path);
     if(!file) {
-        reporter.message(std::format("couldn't open the file {}", path), true);
+        reporter.report(std::format("Couldn't open the file {}", path), true);
         return 1;
     }
 
