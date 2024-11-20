@@ -75,9 +75,11 @@ token &parser::consume(const token::tokenType type, const std::string &msg) {
  * @return parse_error
  */
 parse_error parser::error(const token &token, const std::string &msg) const {
-    if(token.type==END_OF_FILE) reporter.error(token.line, " at end", msg);
-    else reporter.error(token.line, std::format(" at '{}'", token.lexeme), msg);
-    return parse_error();
+	parse_error err(msg, token.line, token.type==END_OF_FILE ?
+				" at end" :
+				std::format(" at '{}'", token.lexeme));
+	reporter.parse_error(err);
+    return err;
 }
 
 

@@ -13,25 +13,60 @@ using namespace cfp::io;
 reporter::reporter(std::ostream &out, std::istream &in, std::ostream &err) : out(out), err(err), in(in){
 }
 
+
+void reporter::report(const std::string &msg, const bool isError) const {
+	   if(isError) {
+		      hadError = true;
+		      std::cerr << msg;
+	   } else std::cout << msg;
+}
+
+
 /*!
- * @brief output info message to the output stream
+ * @return true if it has error
  */
-void reporter::info(const int line, const std::string& where, const std::string &msg) const {
-    report(line, messageType::INFO, where, msg);
+bool reporter::getHadError() const {
+	   return hadError;
 }
 
 /*!
- * @brief output warning message to the output stream
+ * @brief
  */
-void reporter::warning(const int line, const std::string& where, const std::string &msg) const {
-    report(line, messageType::WARNING, where, msg);
+void reporter::resetHadError() const {
+	   hadError = false;
 }
+
+
+
+/*!
+ * @brief output info message to the output stream
+ */
+void reporter::parse_info(const int line, const std::string& where, const std::string &msg) const {
+    parse_report(line, where, msg, false);
+}
+
 
 /*!
  * @brief output error message to the error stream
  */
-void reporter::error(const int line, const std::string& where, const std::string &msg) const {
-    report(line, messageType::ERROR, where, msg);
+void reporter::parse_error(const int line, const std::string& where, const std::string &msg) const {
+    parse_report(line, where, msg, true);
+}
+
+/*!
+ * @brief output parse error to error stream
+ */
+void reporter::parse_error(const parse::parse_error &err) const {
+	   parse_error(err.line(), err.where(), err.what());
+}
+
+
+
+/*!
+ * @brief output runtime_error to the error stream
+ */
+void reporter::runtime_error(const std::string& str) const {
+	   runtime_report(str);
 }
 
 /*!
@@ -41,44 +76,21 @@ void reporter::runtime_error(const interpreting::runtime_error &err) const {
     runtime_error(err.what());
 }
 
+
+
+
+
 /*!
- * @brief output runtime_error to the error stream
+ * @brief report parse messages
  */
-void reporter::runtime_error(const std::string& str) const {
-	message(std::format("[runtime] Error: {}\n", str), true);
+void reporter::parse_report(const int line, const std::string& where, const std::string &msg, const bool isError) const {
+    report(std::format("[line {}] Error{}: {}\n", line, where, msg), isError);
 }
 
 
 /*!
- * @param msg a message is outputted
- * @param error if true method outputs to the error stream
+ * @brief report runtime errors
  */
-void reporter::message(const std::string &msg, const bool error) const {
-    if(error) {
-        hadError = true;
-        err << msg;
-    }
-    else out << msg;
+void reporter::runtime_report(const std::string &msg) const {
+    report(std::format("Error: {}", msg), true);
 }
-
-/*!
- * @brief report messages
- */
-void reporter::report(const int line, const messageType &type, const std::string& where, const std::string &msg) const {
-    message(std::format("[line {}] Error{}: {}\n", line, where, msg), type==messageType::ERROR);
-}
-
-/*!
- * @return return true if reporter has error output
- */
-bool reporter::getHadError() const {
-    return hadError;
-}
-
-/*!
- * @brief reset hasError
- */
-void reporter::resetHadError() const {
-    hadError = false;
-}
-

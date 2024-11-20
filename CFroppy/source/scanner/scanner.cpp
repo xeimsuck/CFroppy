@@ -106,7 +106,7 @@ void scanner::scanToken() {
         default:
             if(isDigit(ch)) number();
             else if(isAlpha(ch)) identifier();
-            else reporter.error(line, "", std::format("Unexpected character \'{}\'", ch));
+            else reporter.parse_error(line, "", std::format("Unexpected character \'{}\'", ch));
             break;
     }
 }
@@ -210,7 +210,7 @@ void scanner::string() {
     }
 
     if(isAtEnd()) {
-        reporter.error(line, "", "Unterminated string");
+        reporter.parse_error(line, "", "Unterminated string");
         return;
     }
 
