@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "../ast/expression.hpp"
-#include "../ast/statement.hpp"
+#include "../ast/expr/exprVisitor.hpp"
+#include "../ast/stmt/stmtVisitor.hpp"
 #include "../io/reporter.hpp"
 #include "environment.hpp"
 

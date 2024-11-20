@@ -306,7 +306,7 @@ void parser::synchronize() {
 
         switch (peek().type) {
             case CLASS:
-            case FUN:
+            case FN:
             case VAR:
             case FOR:
             case IF:
