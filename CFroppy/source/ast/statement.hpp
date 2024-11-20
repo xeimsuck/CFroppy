@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include "expression.hpp"
-#include "../scanner/token.hpp"
+#include "../token/token.hpp"
 
 /*!
     @file

@@ -3,7 +3,7 @@
 #include "../ast/expression.hpp"
 #include "../ast/statement.hpp"
 #include "../io/reporter.hpp"
-#include "../scanner/token.hpp"
+#include "../token/token.hpp"
 
 namespace cfp::parse {
     /*!
