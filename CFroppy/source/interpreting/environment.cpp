@@ -1,5 +1,7 @@
 #include "environment.hpp"
 #include <format>
+#include "runtime_error.hpp"
+
 
 using namespace cfp;
 using namespace cfp::interpreting;

@@ -4,7 +4,6 @@
 #include "../ast/statement.hpp"
 #include "../io/reporter.hpp"
 #include "../token/token.hpp"
-#include "parse_error.hpp"
 
 namespace cfp::parse {
     /*!
