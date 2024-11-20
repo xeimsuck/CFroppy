@@ -13,7 +13,7 @@ static std::unordered_map<std::string, token::tokenType> keywords{
     {"else",   ELSE},
     {"false",  FALSE},
     {"for",    FOR},
-    {"fun",    FUN},
+    {"fn",     FN},
     {"if",     IF},
     {"nil",    NIL},
     {"or",     OR},

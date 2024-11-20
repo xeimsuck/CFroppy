@@ -32,7 +32,7 @@ namespace cfp::scan {
             IDENTIFIER, STRING, NUMBER,
 
             // Keywords.
-            AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+            AND, CLASS, ELSE, FALSE, FN, FOR, IF, NIL, OR,
             PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, BREAK,
 
             END_OF_FILE
