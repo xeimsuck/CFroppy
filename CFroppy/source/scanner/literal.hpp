@@ -1,6 +1,11 @@
 #pragma once
 #include <string>
 #include <variant>
+#include "types/boolean.hpp"
+#include "types/decimal.hpp"
+#include "types/integer.hpp"
+#include "types/string.hpp"
+#include "types/nil.hpp"
 
 /*!
     @file
@@ -11,16 +16,6 @@
 
 
 namespace cfp::scan {
-    namespace types {
-        using nil = std::monostate;
-        using integer = long long;
-        using decimal = double;
-        using boolean = bool;
-        using string = std::string;
-
-        inline constexpr nil nil_v;
-    }
-
     /*!
     @brief represent literal
      */
