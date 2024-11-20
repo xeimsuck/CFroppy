@@ -127,6 +127,23 @@ scan::literal interpreter::visit(ast::expr::assign &expr) {
 
 
 /*!
+ * @brief evaluate binary assign
+ */
+scan::literal interpreter::visit(ast::expr::binary_assign &expr) {
+	const auto value = evaluate(expr.value);
+
+	switch (expr.oper.type) {
+		case PLUS_EQUAL: return env->assign(expr.name.lexeme, env->get(expr.name.lexeme)+value);
+		case MINUS_EQUAL: return env->assign(expr.name.lexeme, env->get(expr.name.lexeme)-value);
+		case STAR_EQUAL: return env->assign(expr.name.lexeme, env->get(expr.name.lexeme)*value);
+		case SLASH_EQUAL: return env->assign(expr.name.lexeme, env->get(expr.name.lexeme)/value);
+		default: return {};
+	}
+}
+
+
+
+/*!
  * @brief evaluate logical expression
  */
 scan::literal interpreter::visit(ast::expr::logical &expr) {

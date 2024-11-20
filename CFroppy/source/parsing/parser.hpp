@@ -28,6 +28,7 @@ namespace cfp::parse {
         std::unique_ptr<ast::expr::expression> comparison();
         std::unique_ptr<ast::expr::expression> term();
         std::unique_ptr<ast::expr::expression> factor();
+        std::unique_ptr<ast::expr::expression> binary_assignment();
         std::unique_ptr<ast::expr::expression> unary();
         std::unique_ptr<ast::expr::expression> primary();
 

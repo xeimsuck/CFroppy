@@ -18,6 +18,7 @@ namespace cfp::ast::expr {
 	struct unary;
 	struct variable;
 	struct assign;
+	struct binary_assign;
 	struct logical;
 
 
@@ -36,6 +37,7 @@ namespace cfp::ast::expr {
         virtual scan::literal visit(unary& expr) = 0;
         virtual scan::literal visit(variable& expr) = 0;
         virtual scan::literal visit(assign& expr) = 0;
+        virtual scan::literal visit(binary_assign& expr) = 0;
         virtual scan::literal visit(logical& expr) = 0;
     };
 
@@ -125,6 +127,19 @@ namespace cfp::ast::expr {
 		scan::token name;
 	};
 
+
+	/*!
+	@brief represent binary assign (+=, -= etc.)
+	 */
+	struct binary_assign final : expression {
+		explicit binary_assign(scan::token name, std::unique_ptr<expression>&& value, scan::token oper);
+
+		scan::literal accept(exprVisitor &visitor) override;
+
+		std::unique_ptr<expression> value;
+		scan::token name;
+		scan::token oper;
+	};
 
 	/*!
 	@brief represent logical expression
