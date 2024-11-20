@@ -15,13 +15,6 @@ parser::parser(std::vector<token> &tokens, const io::reporter &reporter) : repor
 
 
 /*!
- * @param err message
- */
-parser::parse_error::parse_error(const std::string &err) : runtime_error(err) {
-}
-
-
-/*!
  * @brief execute a parser
  * @return root of AST
  */
@@ -81,7 +74,7 @@ token &parser::consume(const token::tokenType type, const std::string &msg) {
  * @param msg message in parse_error
  * @return parse_error
  */
-parser::parse_error parser::error(const token &token, const std::string &msg) const {
+parse_error parser::error(const token &token, const std::string &msg) const {
     if(token.type==END_OF_FILE) reporter.error(token.line, " at end", msg);
     else reporter.error(token.line, std::format(" at '{}'", token.lexeme), msg);
     return parse_error();

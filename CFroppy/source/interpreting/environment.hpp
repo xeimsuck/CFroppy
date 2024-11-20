@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "../token/literal.hpp"
-#include "runtimeError.hpp"
+#include "runtime_error.hpp"
 
 /*!
 	@file

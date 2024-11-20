@@ -4,6 +4,7 @@
 #include "../ast/statement.hpp"
 #include "../io/reporter.hpp"
 #include "../token/token.hpp"
+#include "parse_error.hpp"
 
 namespace cfp::parse {
     /*!
@@ -13,11 +14,6 @@ namespace cfp::parse {
     public:
         parser(std::vector<scan::token>& tokens, const io::reporter& reporter);
         std::vector<std::unique_ptr<ast::stmt::statement>> parse();
-
-        class parse_error final : public std::runtime_error {
-        public:
-            explicit parse_error(const std::string& err = "");
-        };
 
     private:
         std::unique_ptr<ast::expr::expression> expr();

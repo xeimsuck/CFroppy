@@ -1,7 +1,8 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include "../interpreting/runtimeError.hpp"
+#include "../interpreting/runtime_error.hpp"
+#include "../parsing/parse_error.hpp"
 
 /*!
     @file
