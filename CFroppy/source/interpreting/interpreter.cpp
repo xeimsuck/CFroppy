@@ -158,6 +158,15 @@ scan::literal interpreter::visit(ast::expr::logical &expr) {
 }
 
 
+/*!
+ * @brief evaluate visit expression
+ */
+scan::literal interpreter::visit(ast::expr::call &expr) {
+	return {};
+}
+
+
+
 
 
 /*!

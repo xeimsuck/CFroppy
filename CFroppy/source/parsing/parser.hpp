@@ -25,6 +25,7 @@ namespace cfp::parse {
         std::unique_ptr<ast::expr::expression> factor();
         std::unique_ptr<ast::expr::expression> binary_assignment();
         std::unique_ptr<ast::expr::expression> unary();
+        std::unique_ptr<ast::expr::expression> call();
         std::unique_ptr<ast::expr::expression> primary();
 
         std::unique_ptr<ast::stmt::statement> declaration();
@@ -38,6 +39,7 @@ namespace cfp::parse {
         std::unique_ptr<ast::stmt::loop> forStatement();
         std::unique_ptr<ast::stmt::break_loop> breakStatement();
 
+        std::unique_ptr<ast::expr::expression> finishCall(std::unique_ptr<ast::expr::expression>&& callee);
         void synchronize();
 
         [[nodiscard]] bool isAtEnd() const;
@@ -45,7 +47,7 @@ namespace cfp::parse {
 
         scan::token& advance();
         scan::token& consume(scan::token::tokenType type, const std::string& msg);
-        [[nodiscard]] parse_error error(const scan::token& token, const std::string& msg) const;
+        parse_error error(const scan::token& token, const std::string& msg) const;
         [[nodiscard]] scan::token& peek() const;
         [[nodiscard]] scan::token& previous() const;
 

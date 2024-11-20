@@ -261,11 +261,45 @@ std::unique_ptr<expr::expression> parser::binary_assignment() {
 std::unique_ptr<expr::expression> parser::unary() {
     if(match(BANG, MINUS)) {
         decltype(auto) oper = previous();
-        return  std::make_unique<expr::unary>(primary(), oper);
+        return std::make_unique<expr::unary>(call(), oper);
     }
 
-    return primary();
+    return call();
 }
+
+
+/*!
+ * @brief parse call productions
+ * @return expression
+ */
+std::unique_ptr<expr::expression> parser::call() {
+	auto expr = primary();
+
+	while(match(LEFT_PAREN)) {
+		expr = finishCall(std::move(expr));
+	}
+
+	return expr;
+}
+
+
+std::unique_ptr<expr::expression> parser::finishCall(std::unique_ptr<expr::expression> &&callee) {
+	std::vector<std::unique_ptr<expr::expression>> arguments;
+
+	if(!check(RIGHT_PAREN)) {
+		do {
+			if(arguments.size()>=255) {
+				error(peek(), "Can't have more than 255 arguments.");
+			}
+			arguments.push_back(this->expr());
+		} while (match(COMMA));
+	}
+
+	decltype(auto) paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+	return std::make_unique<expr::call>(std::move(callee), paren, std::move(arguments));
+}
+
 
 
 /*!
@@ -293,6 +327,7 @@ std::unique_ptr<expr::expression> parser::primary() {
 
     throw error(peek(), "Expect expression.");
 }
+
 
 
 /*!
