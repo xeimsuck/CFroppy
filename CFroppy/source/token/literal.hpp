@@ -56,6 +56,12 @@ namespace cfp::scan {
             return std::holds_alternative<T>(value);
         }
 
+        [[nodiscard]] literal toBoolean() const;
+        [[nodiscard]] literal toInteger() const;
+        [[nodiscard]] literal toDecimal() const;
+        [[nodiscard]] literal toString() const;
+        [[nodiscard]] literal toCallable() const;
+
         [[nodiscard]] types::boolean getBoolean() const;
         [[nodiscard]] types::integer getInteger() const;
         [[nodiscard]] types::decimal getDecimal() const;

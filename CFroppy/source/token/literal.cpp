@@ -44,6 +44,38 @@ literal::literal(callable val) : value(std::move(val)) {
 }
 
 
+literal literal::toBoolean() const {
+    if(has<boolean>()) return literal(getBoolean()); // return bool
+    if(has<integer>()) return literal(static_cast<bool>(getInteger())); // return true if integer != 0
+    if(has<decimal>()) return literal(static_cast<bool>(getDecimal())); // return true if decimal != 0
+    return literal{}; // return nil
+}
+
+literal literal::toCallable() const {
+    if(has<callable>()) return literal(getCallable());
+    return literal{}; // return nil
+}
+
+literal literal::toDecimal() const {
+    if(has<boolean>()) return literal(static_cast<decimal>(getBoolean())); // return 1.0 if true, otherwise 0.0
+    if(has<integer>()) return literal(static_cast<decimal>(getInteger())); // return casted integer
+    if(has<decimal>()) return literal(getDecimal()); // return decimal
+    return literal{}; // return nil
+}
+
+literal literal::toInteger() const {
+    if(has<boolean>()) return literal(static_cast<integer>(getBoolean())); // return 1.0 if true, otherwise 0.0
+    if(has<integer>()) return literal(getInteger()); // return casted integer
+    if(has<decimal>()) return literal(static_cast<integer>(getDecimal())); // return decimal
+    return literal{}; // return nil
+}
+
+literal literal::toString() const {
+    return literal(stringify());
+}
+
+
+
 boolean literal::getBoolean() const {
     return std::get<boolean>(value);
 }
@@ -97,6 +129,7 @@ std::string literal::stringify() const {
     if(has<string>()) return getString();
     if(has<integer>()) return std::to_string(getInteger());
     if(has<decimal>()) return std::to_string(getDecimal());
+    if(has<callable>()) return "callable";
     return "nil";
 }
 
