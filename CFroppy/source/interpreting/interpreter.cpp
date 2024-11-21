@@ -71,6 +71,22 @@ namespace native {
 
 		return scan::literal{dur};
 	};
+
+	callable::native to_string = [](interpreter*, const std::vector<scan::literal>& vars) {
+		return vars[0].toString();
+	};
+
+	callable::native to_decimal = [](interpreter*, const std::vector<scan::literal>& vars) {
+		return vars[0].toDecimal();
+	};
+
+	callable::native to_integer = [](interpreter*, const std::vector<scan::literal>& vars) {
+		return vars[0].toInteger();
+	};
+
+	callable::native to_boolean = [](interpreter*, const std::vector<scan::literal>& vars) {
+		return vars[0].toBoolean();
+	};
 }
 
 
@@ -87,6 +103,10 @@ interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env
 	env->define("input", scan::literal(callable(0, native::input)));
 	env->define("sleep", scan::literal(callable(1, native::sleep)));
 	env->define("duration", scan::literal(callable(2, native::duration)));
+	env->define("to_string", scan::literal(callable(1, native::to_string)));
+	env->define("to_decimal", scan::literal(callable(1, native::to_decimal)));
+	env->define("to_integer", scan::literal(callable(1, native::to_integer)));
+	env->define("to_boolean", scan::literal(callable(1, native::to_boolean)));
 }
 
 /*!

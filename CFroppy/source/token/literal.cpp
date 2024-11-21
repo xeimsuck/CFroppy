@@ -48,6 +48,11 @@ literal literal::toBoolean() const {
     if(has<boolean>()) return literal(getBoolean()); // return bool
     if(has<integer>()) return literal(static_cast<bool>(getInteger())); // return true if integer != 0
     if(has<decimal>()) return literal(static_cast<bool>(getDecimal())); // return true if decimal != 0
+    if(has<string>()) {
+        const auto str = getString();
+        if(str=="true") return literal{true};
+        if(str=="false") return literal{false};
+    }
     return literal{}; // return nil
 }
 
@@ -60,6 +65,11 @@ literal literal::toDecimal() const {
     if(has<boolean>()) return literal(static_cast<decimal>(getBoolean())); // return 1.0 if true, otherwise 0.0
     if(has<integer>()) return literal(static_cast<decimal>(getInteger())); // return casted integer
     if(has<decimal>()) return literal(getDecimal()); // return decimal
+    if(has<string>()) {
+        try {
+            return literal(std::stod(getString()));
+        } catch (...) {}
+    }
     return literal{}; // return nil
 }
 
@@ -67,6 +77,11 @@ literal literal::toInteger() const {
     if(has<boolean>()) return literal(static_cast<integer>(getBoolean())); // return 1.0 if true, otherwise 0.0
     if(has<integer>()) return literal(getInteger()); // return casted integer
     if(has<decimal>()) return literal(static_cast<integer>(getDecimal())); // return decimal
+    if(has<string>()) {
+        try {
+            return literal(std::stoll(getString()));
+        } catch (...) {}
+    }
     return literal{}; // return nil
 }
 
