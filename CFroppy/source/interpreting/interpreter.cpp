@@ -122,7 +122,7 @@ namespace native {
 	callable::native duration = [](interpreter*, const std::vector<scan::literal>& vars) {
 		if(!vars[0].has<integer>() || !vars[1].has<integer>()) return scan::literal{};
 
-		const auto dur = static_cast<decimal>(vars[1].getInteger()-vars[0].getInteger()) /  CLOCKS_PER_SEC;
+		const auto dur = static_cast<decimal>(vars[1].getInteger()-vars[0].getInteger()) /  CLOCKS_PER_SEC * 1000;
 
 		return scan::literal{dur};
 	};
