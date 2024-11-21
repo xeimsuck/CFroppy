@@ -1,11 +1,7 @@
 #pragma once
 #include <string>
 #include <variant>
-#include "types/boolean.hpp"
-#include "types/decimal.hpp"
-#include "types/integer.hpp"
-#include "types/string.hpp"
-#include "types/nil.hpp"
+#include <functional>
 
 /*!
     @file
@@ -14,18 +10,46 @@
     @data 16.11.24
  */
 
+namespace cfp::interpreting {
+    class interpreter;
+}
 
 namespace cfp::scan {
+    class literal;
+
+    namespace types {
+        class callable {
+        public:
+            using native = std::function<literal(interpreting::interpreter*, const std::vector<literal>&)>;
+
+            callable(int arity, native func);
+            [[nodiscard]] int arity() const;
+            literal call(interpreting::interpreter* interpreter, const std::vector<literal>& arguments) const;
+
+        private:
+            int arity_;
+            native native_;
+        };
+
+        using boolean = bool;
+        using decimal = double;
+        using integer = long long;
+        using nil = std::monostate;
+        inline constexpr nil nil_v;
+        using string = std::string;
+    }
+
     /*!
     @brief represent literal
      */
     class literal {
     public:
-        literal(types::nil = types::nil_v);
+        explicit literal(types::nil = types::nil_v);
         explicit literal(types::integer val);
         explicit literal(types::decimal val);
         explicit literal(types::string val);
         explicit literal(types::boolean val);
+        explicit literal(types::callable val);
 
         template<typename T>
         [[nodiscard]] bool has() const {
@@ -36,11 +60,13 @@ namespace cfp::scan {
         [[nodiscard]] types::integer getInteger() const;
         [[nodiscard]] types::decimal getDecimal() const;
         [[nodiscard]] types::string getString() const;
+        [[nodiscard]] types::callable getCallable() const;
 
         void setBoolean(types::boolean);
         void setInteger(types::integer);
         void setDecimal(types::decimal);
         void setString(types::string);
+        void setCallable(types::callable);
         void setNil();
 
         [[nodiscard]] std::string stringify() const;
@@ -71,6 +97,6 @@ namespace cfp::scan {
         explicit operator bool() const;
         explicit operator std::string() const;
     private:
-        std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string> value;
+        std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string, types::callable> value;
     };
 }
