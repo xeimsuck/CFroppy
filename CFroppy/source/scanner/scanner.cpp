@@ -17,7 +17,6 @@ static std::unordered_map<std::string, token::tokenType> keywords{
     {"if",     IF},
     {"nil",    NIL},
     {"or",     OR},
-    {"print",  PRINT},
     {"return", RETURN},
     {"super",  SUPER},
     {"this",   THIS},

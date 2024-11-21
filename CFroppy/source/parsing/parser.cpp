@@ -346,7 +346,6 @@ void parser::synchronize() {
             case FOR:
             case IF:
             case WHILE:
-            case PRINT:
             case RETURN:
               return;
           default: break;
@@ -398,7 +397,6 @@ std::unique_ptr<stmt::var> parser::varDeclaration() {
  * @return statement
  */
 std::unique_ptr<stmt::statement> parser::statement() {
-    if(match(PRINT)) return printStatement();
 	if(match(LEFT_BRACE)) return block();
 	if(match(IF)) return ifStatement();
 	if(match(WHILE)) return whileStatement();
@@ -424,16 +422,6 @@ std::unique_ptr<stmt::block> parser::block() {
 	return std::make_unique<stmt::block>(std::move(statements));
 }
 
-
-/*!
- * @brief parse print
- * @return print statement
- */
-std::unique_ptr<stmt::print> parser::printStatement() {
-    decltype(auto) expr = this->expr();
-    consume(SEMICOLON, "Expect ; after expression.");
-    return std::make_unique<stmt::print>(std::move(expr));
-}
 
 /*!
  * @brief parse expression

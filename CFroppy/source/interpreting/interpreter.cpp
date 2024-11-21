@@ -16,6 +16,43 @@ using enum scan::token::tokenType;
 struct break_throw {};
 
 namespace native {
+	/*!
+	 * @brief output string
+	 */
+	callable::native print = [](interpreter*, const std::vector<scan::literal>& vars) {
+		std::cout << vars[0].stringify() << std::flush;
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief output string
+	 */
+	callable::native println = [](interpreter*, const std::vector<scan::literal>& vars) {
+		std::cout << vars[0].stringify() << std::endl;
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief output string to error stream
+	 */
+	callable::native eprint = [](interpreter*, const std::vector<scan::literal>& vars) {
+		std::cerr << vars[0].stringify() << std::endl;
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief gets string from input stream
+	 */
+	callable::native input = [](interpreter*, const std::vector<scan::literal>& vars) {
+		string in;
+		std::cin >> in;
+		return scan::literal(in);
+	};
+
+
+	/*!
+	 * @brief returns random integer in range [min, max]
+	 */
 	callable::native random = [](interpreter*, const std::vector<scan::literal>& l) {
 		const auto min = l[0].toInteger();
 		const auto max = l[1].toInteger();
@@ -29,6 +66,10 @@ namespace native {
 		return scan::literal{static_cast<long long>(dist(rng))};
 	};
 
+
+	/*!
+	 * @brief concatenates arguments to string
+	 */
 	callable::native format = [](interpreter*, const std::vector<scan::literal>& vars) {
 		std::string res;
 		std::ranges::for_each(vars, [&res](const auto& var) {
@@ -37,26 +78,36 @@ namespace native {
 		return scan::literal{res};
 	};
 
+
+	/*!
+	 * @brief returns current time in unix format
+	 */
 	callable::native time = [](interpreter*, const std::vector<scan::literal>& vars) {
 		return scan::literal{static_cast<integer>(std::time(nullptr))};
 	};
 
+
+	/*!
+	 * @brief return current time in (is not standard)
+	 */
 	callable::native clock = [](interpreter*, const std::vector<scan::literal>& vars) {
 		return scan::literal{static_cast<integer>(std::clock())};
 	};
 
+
+	/*!
+	 * @brief cast time in unix format into date
+	 */
 	callable::native date = [](interpreter*, const std::vector<scan::literal>& vars) {
 		if(!vars[0].has<integer>()) return scan::literal{};
 		const time_t time = vars[0].getInteger();
 		return scan::literal(string(std::asctime(std::localtime(&time))));
 	};
 
-	callable::native input = [](interpreter*, const std::vector<scan::literal>& vars) {
-		string in;
-		std::cin >> in;
-		return scan::literal(in);
-	};
 
+	/*!
+	 * @brief sleep on n milliseconds
+	 */
 	callable::native sleep = [](interpreter*, const std::vector<scan::literal>& vars) {
 		if(vars[0].has<integer>()) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(vars[0].getInteger()));
@@ -64,6 +115,10 @@ namespace native {
 		return scan::literal{};
 	};
 
+
+	/*!
+	 * @brief return duration between two clock() in ms
+	 */
 	callable::native duration = [](interpreter*, const std::vector<scan::literal>& vars) {
 		if(!vars[0].has<integer>() || !vars[1].has<integer>()) return scan::literal{};
 
@@ -72,18 +127,34 @@ namespace native {
 		return scan::literal{dur};
 	};
 
+
+	/*!
+	 * @brief cast variable to string
+	 */
 	callable::native to_string = [](interpreter*, const std::vector<scan::literal>& vars) {
 		return vars[0].toString();
 	};
 
+
+	/*!
+	 * @brief cast variable to decimal
+	 */
 	callable::native to_decimal = [](interpreter*, const std::vector<scan::literal>& vars) {
 		return vars[0].toDecimal();
 	};
 
+
+	/*!
+	 * @brief cast variable to integer
+	 */
 	callable::native to_integer = [](interpreter*, const std::vector<scan::literal>& vars) {
 		return vars[0].toInteger();
 	};
 
+
+	/*!
+	 * @brief cast variable to boolean
+	 */
 	callable::native to_boolean = [](interpreter*, const std::vector<scan::literal>& vars) {
 		return vars[0].toBoolean();
 	};
@@ -95,13 +166,25 @@ namespace native {
  * @param reporter reporter
  */
 interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env(std::make_unique<environment>()) {
-	env->define("rand", scan::literal(callable(2, native::random)));
+	// i/o stream
+	env->define("print", scan::literal(callable(1, native::print)));
+	env->define("println", scan::literal(callable(1, native::println)));
+	env->define("eprint", scan::literal(callable(1, native::eprint)));
+	env->define("input", scan::literal(callable(0, native::input)));
+
+	// string
 	env->define("format", scan::literal(callable(callable::variadic_arity, native::format)));
+
+	// random
+	env->define("rand", scan::literal(callable(2, native::random)));
+
+	// chrono
 	env->define("time", scan::literal(callable(0, native::time)));
 	env->define("clock", scan::literal(callable(0, native::clock)));
 	env->define("date", scan::literal(callable(1, native::date)));
-	env->define("input", scan::literal(callable(0, native::input)));
 	env->define("sleep", scan::literal(callable(1, native::sleep)));
+
+	// casts
 	env->define("duration", scan::literal(callable(2, native::duration)));
 	env->define("to_string", scan::literal(callable(1, native::to_string)));
 	env->define("to_decimal", scan::literal(callable(1, native::to_decimal)));
@@ -278,15 +361,6 @@ scan::literal interpreter::visit(ast::expr::call &expr) {
  */
 void interpreter::visit(ast::stmt::expression &stmt) {
     evaluate(stmt.expr);
-}
-
-
-/*!
- * @brief execute print statement
- */
-void interpreter::visit(ast::stmt::print &stmt) {
-    const auto literal = evaluate(stmt.expr);
-    std::cout << literal.stringify() << std::endl;
 }
 
 

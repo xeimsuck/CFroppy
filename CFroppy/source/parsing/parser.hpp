@@ -32,7 +32,6 @@ namespace cfp::parse {
         std::unique_ptr<ast::stmt::var> varDeclaration();
         std::unique_ptr<ast::stmt::block> block();
         std::unique_ptr<ast::stmt::statement> statement();
-        std::unique_ptr<ast::stmt::print> printStatement();
         std::unique_ptr<ast::stmt::expression> expressionStatement();
         std::unique_ptr<ast::stmt::if_else> ifStatement();
         std::unique_ptr<ast::stmt::loop> whileStatement();

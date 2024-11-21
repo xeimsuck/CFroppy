@@ -8,16 +8,16 @@ var c = "global;
     {
         var a = "local-2";
 
-        print a;
-        print b;
-        print c;
+        println a;
+        println b;
+        println c;
     }
 
-    print a;
-    print b;
-    print c;
+    println a;
+    println b;
+    println c;
 }
 
-print a;
-print b;
-print c;
+println a;
+println b;
+println c;
