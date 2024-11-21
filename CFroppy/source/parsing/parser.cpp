@@ -487,8 +487,10 @@ std::unique_ptr<stmt::loop> parser::forStatement() {
 	consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
 	std::unique_ptr<stmt::statement> initializer;
-	if(match(VAR)) initializer = varDeclaration();
-	else initializer = expressionStatement();
+	if(!match(SEMICOLON)) {
+		if(match(VAR)) initializer = varDeclaration();
+		else initializer = expressionStatement();
+	}
 
 	std::unique_ptr<expr::expression> conditional;
 	if(check(SEMICOLON)) conditional = std::make_unique<expr::literal>(literal{true});
