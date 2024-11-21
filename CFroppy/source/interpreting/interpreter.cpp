@@ -1,5 +1,10 @@
 #include "interpreter.hpp"
+#include <functional>
 #include <iostream>
+#include <ranges>
+#include <vector>
+#include <random>
+#include <thread>
 #include <bits/ranges_algo.h>
 #include "runtime_error.hpp"
 
@@ -10,10 +15,78 @@ using enum scan::token::tokenType;
 
 struct break_throw {};
 
+namespace native {
+	callable::native random = [](interpreter*, const std::vector<scan::literal>& l) {
+		const auto min = l[0].toInteger();
+		const auto max = l[1].toInteger();
+		if(!min.has<integer>() || !max.has<integer>()) return scan::literal{};
+
+		static std::random_device dev;
+		static std::mt19937 rng(dev());
+
+		std::uniform_int_distribution<std::mt19937::result_type> dist(min.getInteger(), max.getInteger());
+
+		return scan::literal{static_cast<long long>(dist(rng))};
+	};
+
+	callable::native format = [](interpreter*, const std::vector<scan::literal>& vars) {
+		std::string res;
+		std::ranges::for_each(vars, [&res](const auto& var) {
+			res+=var.stringify();
+		});
+		return scan::literal{res};
+	};
+
+	callable::native time = [](interpreter*, const std::vector<scan::literal>& vars) {
+		return scan::literal{static_cast<integer>(std::time(nullptr))};
+	};
+
+	callable::native clock = [](interpreter*, const std::vector<scan::literal>& vars) {
+		return scan::literal{static_cast<integer>(std::clock())};
+	};
+
+	callable::native date = [](interpreter*, const std::vector<scan::literal>& vars) {
+		if(!vars[0].has<integer>()) return scan::literal{};
+		const time_t time = vars[0].getInteger();
+		return scan::literal(string(std::asctime(std::localtime(&time))));
+	};
+
+	callable::native input = [](interpreter*, const std::vector<scan::literal>& vars) {
+		string in;
+		std::cin >> in;
+		return scan::literal(in);
+	};
+
+	callable::native sleep = [](interpreter*, const std::vector<scan::literal>& vars) {
+		if(vars[0].has<integer>()) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(vars[0].getInteger()));
+		}
+		return scan::literal{};
+	};
+
+	callable::native duration = [](interpreter*, const std::vector<scan::literal>& vars) {
+		if(!vars[0].has<integer>() || !vars[1].has<integer>()) return scan::literal{};
+
+		const auto dur = static_cast<decimal>(vars[1].getInteger()-vars[0].getInteger()) /  CLOCKS_PER_SEC;
+
+		return scan::literal{dur};
+	};
+}
+
+
+
 /*!
  * @param reporter reporter
  */
 interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env(std::make_unique<environment>()) {
+	env->define("rand", scan::literal(callable(2, native::random)));
+	env->define("format", scan::literal(callable(callable::variadic_arity, native::format)));
+	env->define("time", scan::literal(callable(0, native::time)));
+	env->define("clock", scan::literal(callable(0, native::clock)));
+	env->define("date", scan::literal(callable(1, native::date)));
+	env->define("input", scan::literal(callable(0, native::input)));
+	env->define("sleep", scan::literal(callable(1, native::sleep)));
+	env->define("duration", scan::literal(callable(2, native::duration)));
 }
 
 /*!
@@ -77,7 +150,7 @@ scan::literal interpreter::visit(ast::expr::binary &expr) {
         case LESS_EQUAL: return scan::literal(left<=right);
         case EQUAL_EQUAL: return scan::literal(left==right);
         case BANG_EQUAL: return scan::literal(left!=right);
-        default: return {};
+        default: return scan::literal{};
     }
 }
 
@@ -106,7 +179,7 @@ scan::literal interpreter::visit(ast::expr::unary &expr) {
             return -right;
         case BANG:
             return scan::literal(!right);
-        default: return {};
+        default: return scan::literal{};
     }
 }
 
@@ -136,7 +209,7 @@ scan::literal interpreter::visit(ast::expr::binary_assign &expr) {
 		case MINUS_EQUAL: return env->assign(expr.name.lexeme, env->get(expr.name.lexeme)-value);
 		case STAR_EQUAL: return env->assign(expr.name.lexeme, env->get(expr.name.lexeme)*value);
 		case SLASH_EQUAL: return env->assign(expr.name.lexeme, env->get(expr.name.lexeme)/value);
-		default: return {};
+		default: return scan::literal{};
 	}
 }
 
@@ -162,7 +235,18 @@ scan::literal interpreter::visit(ast::expr::logical &expr) {
  * @brief evaluate visit expression
  */
 scan::literal interpreter::visit(ast::expr::call &expr) {
-	return {};
+	const auto callee = evaluate(expr.callee);
+
+	std::vector<scan::literal> arguments;
+	for(decltype(auto) arg : expr.arguments) {
+		arguments.push_back(evaluate(arg));
+	}
+
+	if(!callee.has<callable>()) {
+		throw runtime_error("Can only call functions and classes.");
+	}
+
+	return callee.getCallable().call(this, arguments);
 }
 
 
