@@ -21,14 +21,15 @@ namespace cfp::scan {
         class callable {
         public:
             using native = std::function<literal(interpreting::interpreter*, const std::vector<literal>&)>;
+            constexpr int variadic_arity = -1;
 
             callable(int arity, native func);
             [[nodiscard]] int arity() const;
             literal call(interpreting::interpreter* interpreter, const std::vector<literal>& arguments) const;
 
         private:
-            int arity_;
-            native native_;
+            int arity_=0;
+            native native_=nullptr;
         };
 
         using boolean = bool;

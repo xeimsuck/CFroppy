@@ -15,7 +15,7 @@ int callable::arity() const {
 
 
 literal callable::call(interpreting::interpreter *interpreter, const std::vector<literal> &arguments) const {
-    if(arguments.size()!=arity_) {
+    if(arity_!=variadic_arity && arguments.size()!=arity_) {
         throw interpreting::runtime_error(std::format("Expected {} arguments but got {}\n", arity_, arguments.size()));
     }
     if(native_) {
