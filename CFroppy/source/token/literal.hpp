@@ -21,7 +21,7 @@ namespace cfp::scan {
         class callable {
         public:
             using native = std::function<literal(interpreting::interpreter*, const std::vector<literal>&)>;
-            constexpr int variadic_arity = -1;
+            static constexpr int variadic_arity = -1;
 
             callable(int arity, native func);
             [[nodiscard]] int arity() const;
