@@ -1,28 +1,48 @@
 #include "literal.hpp"
+#include <format>
+#include "../interpreting/runtime_error.hpp"
 
 using namespace cfp;
 using namespace cfp::scan;
 using namespace cfp::scan::types;
 
-literal::literal(nil val) {
-    value = val;
+callable::callable(const int arity, native func) : arity_(arity), native_(std::move(func)) {
 }
 
-literal::literal(boolean val) {
-    value = val;
+int callable::arity() const {
+    return arity_;
 }
 
-literal::literal(decimal val) {
-    value = val;
+
+literal callable::call(interpreting::interpreter *interpreter, const std::vector<literal> &arguments) const {
+    if(arguments.size()!=arity_) {
+        throw interpreting::runtime_error(std::format("Expected {} arguments but got {}\n", arity_, arguments.size()));
+    }
+    if(native_) {
+        return native_(interpreter, arguments);
+    }
+    return scan::literal{};
 }
 
-literal::literal(integer val) {
-    value = val;
+
+literal::literal(nil val) : value(val) {
 }
 
-literal::literal(string val) {
-    value = std::move(val);
+literal::literal(boolean val) : value(val) {
 }
+
+literal::literal(decimal val) : value(val) {
+}
+
+literal::literal(integer val) : value(val) {
+}
+
+literal::literal(string val) : value(std::move(val)){
+}
+
+literal::literal(callable val) : value(std::move(val)) {
+}
+
 
 boolean literal::getBoolean() const {
     return std::get<boolean>(value);
@@ -40,6 +60,12 @@ string literal::getString() const {
     return std::get<string>(value);
 }
 
+callable literal::getCallable() const {
+    return std::get<callable>(value);
+}
+
+
+
 void literal::setBoolean(boolean val) {
     value = val;
 }
@@ -56,9 +82,15 @@ void literal::setString(string val) {
     value = std::move(val);
 }
 
+void literal::setCallable(callable val) {
+    value = std::move(val);
+}
+
 void literal::setNil() {
     value = nil_v;
 }
+
+
 
 std::string literal::stringify() const {
     if(has<boolean>()) return getBoolean() ? "true" : "false";
@@ -155,7 +187,7 @@ literal literal::operator-() const {
     if(has<decimal>()) {
         return literal(-getDecimal());
     }
-    return {};
+    return scan::literal{};
 }
 
 literal::operator bool() const {
@@ -177,7 +209,7 @@ literal literal::operator+(const literal &rhs) const {
     } else if(has<types::string>() && rhs.has<types::string>()) {
         return scan::literal(getString()+rhs.getString());
     }
-    return {};
+    return scan::literal{};
 }
 
 literal literal::operator-(const literal &rhs) const {
@@ -189,7 +221,7 @@ literal literal::operator-(const literal &rhs) const {
         if(rhs.has<types::integer>()) return literal(getDecimal() - static_cast<types::decimal>(rhs.getInteger()));
         if(rhs.has<types::decimal>()) return literal(getDecimal() - rhs.getDecimal());
     }
-    return {};
+    return scan::literal{};
 }
 
 literal literal::operator*(const literal &rhs) const {
@@ -200,7 +232,7 @@ literal literal::operator*(const literal &rhs) const {
         if(rhs.has<types::integer>()) return literal(getDecimal() * static_cast<types::decimal>(rhs.getInteger()));
         if(rhs.has<types::decimal>()) return literal(getDecimal() * rhs.getDecimal());
     }
-    return {};
+    return scan::literal{};
 }
 
 literal literal::operator/(const literal &rhs) const {
@@ -211,7 +243,7 @@ literal literal::operator/(const literal &rhs) const {
         if(rhs.has<types::integer>()) return literal(getDecimal() / static_cast<types::decimal>(rhs.getInteger()));
         if(rhs.has<types::decimal>()) return literal(getDecimal() / rhs.getDecimal());
     }
-    return {};
+    return scan::literal{};
 }
 
 literal::operator std::string() const {
