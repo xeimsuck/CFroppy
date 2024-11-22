@@ -42,6 +42,7 @@ namespace cfp::interpreting {
         void visit(ast::stmt::if_else &stmt) override;
         void visit(ast::stmt::loop &stmt) override;
         void visit(ast::stmt::break_loop &stmt) override;
+        void visit(ast::stmt::function &stmt) override;
 
     private:
         void execute(const std::unique_ptr<ast::stmt::statement>& stmt);

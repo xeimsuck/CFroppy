@@ -19,7 +19,7 @@ namespace native {
 	/*!
 	 * @brief output string
 	 */
-	callable::native print = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native print = [](const std::vector<scan::literal>& vars) {
 		std::cout << vars[0].stringify() << std::flush;
 		return scan::literal{};
 	};
@@ -27,7 +27,7 @@ namespace native {
 	/*!
 	 * @brief output string
 	 */
-	callable::native println = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native println = [](const std::vector<scan::literal>& vars) {
 		std::cout << vars[0].stringify() << std::endl;
 		return scan::literal{};
 	};
@@ -35,7 +35,7 @@ namespace native {
 	/*!
 	 * @brief output string to error stream
 	 */
-	callable::native eprint = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native eprint = [](const std::vector<scan::literal>& vars) {
 		std::cerr << vars[0].stringify() << std::endl;
 		return scan::literal{};
 	};
@@ -43,7 +43,7 @@ namespace native {
 	/*!
 	 * @brief gets string from input stream
 	 */
-	callable::native input = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native input = [](const std::vector<scan::literal>& vars) {
 		string in;
 		std::cin >> in;
 		return scan::literal(in);
@@ -53,7 +53,7 @@ namespace native {
 	/*!
 	 * @brief returns random integer in range [min, max]
 	 */
-	callable::native random = [](interpreter*, const std::vector<scan::literal>& l) {
+	callable::native random = [](const std::vector<scan::literal>& l) {
 		const auto min = l[0].toInteger();
 		const auto max = l[1].toInteger();
 		if(!min.has<integer>() || !max.has<integer>()) return scan::literal{};
@@ -70,7 +70,7 @@ namespace native {
 	/*!
 	 * @brief concatenates arguments to string
 	 */
-	callable::native format = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native format = [](const std::vector<scan::literal>& vars) {
 		std::string res;
 		std::ranges::for_each(vars, [&res](const auto& var) {
 			res+=var.stringify();
@@ -82,7 +82,7 @@ namespace native {
 	/*!
 	 * @brief returns current time in unix format
 	 */
-	callable::native time = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native time = [](const std::vector<scan::literal>& vars) {
 		return scan::literal{static_cast<integer>(std::time(nullptr))};
 	};
 
@@ -90,7 +90,7 @@ namespace native {
 	/*!
 	 * @brief return current time in (is not standard)
 	 */
-	callable::native clock = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native clock = [](const std::vector<scan::literal>& vars) {
 		return scan::literal{static_cast<integer>(std::clock())};
 	};
 
@@ -98,7 +98,7 @@ namespace native {
 	/*!
 	 * @brief cast time in unix format into date
 	 */
-	callable::native date = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native date = [](const std::vector<scan::literal>& vars) {
 		if(!vars[0].has<integer>()) return scan::literal{};
 		const time_t time = vars[0].getInteger();
 		return scan::literal(string(std::asctime(std::localtime(&time))));
@@ -108,7 +108,7 @@ namespace native {
 	/*!
 	 * @brief sleep on n milliseconds
 	 */
-	callable::native sleep = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native sleep = [](const std::vector<scan::literal>& vars) {
 		if(vars[0].has<integer>()) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(vars[0].getInteger()));
 		}
@@ -119,7 +119,7 @@ namespace native {
 	/*!
 	 * @brief return duration between two clock() in ms
 	 */
-	callable::native duration = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native duration = [](const std::vector<scan::literal>& vars) {
 		if(!vars[0].has<integer>() || !vars[1].has<integer>()) return scan::literal{};
 
 		const auto dur = static_cast<decimal>(vars[1].getInteger()-vars[0].getInteger()) /  CLOCKS_PER_SEC * 1000;
@@ -131,7 +131,7 @@ namespace native {
 	/*!
 	 * @brief cast variable to string
 	 */
-	callable::native to_string = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native to_string = [](const std::vector<scan::literal>& vars) {
 		return vars[0].toString();
 	};
 
@@ -139,7 +139,7 @@ namespace native {
 	/*!
 	 * @brief cast variable to decimal
 	 */
-	callable::native to_decimal = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native to_decimal = [](const std::vector<scan::literal>& vars) {
 		return vars[0].toDecimal();
 	};
 
@@ -147,7 +147,7 @@ namespace native {
 	/*!
 	 * @brief cast variable to integer
 	 */
-	callable::native to_integer = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native to_integer = [](const std::vector<scan::literal>& vars) {
 		return vars[0].toInteger();
 	};
 
@@ -155,7 +155,7 @@ namespace native {
 	/*!
 	 * @brief cast variable to boolean
 	 */
-	callable::native to_boolean = [](interpreter*, const std::vector<scan::literal>& vars) {
+	callable::native to_boolean = [](const std::vector<scan::literal>& vars) {
 		return vars[0].toBoolean();
 	};
 }
@@ -349,7 +349,19 @@ scan::literal interpreter::visit(ast::expr::call &expr) {
 		throw runtime_error("Can only call functions and classes.");
 	}
 
-	return callee.getCallable().call(this, arguments);
+	decltype(auto) func = callee.getCallable();
+	if(func.isNative()) return func.getNative()(arguments);
+
+
+	auto funcEnv = std::make_unique<environment>(env.get());
+	auto declaration = func.getDeclaration();
+
+	for(int i = 0; i < declaration->params.size(); ++i) {
+		funcEnv->define(declaration->params[i].lexeme, arguments[i]);
+	}
+
+	executeBlock(declaration->body, std::move(funcEnv));
+	return scan::literal{};
 }
 
 
@@ -416,6 +428,14 @@ void interpreter::visit(ast::stmt::loop &stmt) {
  */
 void interpreter::visit(ast::stmt::break_loop &stmt) {
 	throw break_throw{};
+}
+
+
+/*!
+ * @brief declarate function
+ */
+void interpreter::visit(ast::stmt::function &stmt) {
+	env->define(stmt.name.lexeme, scan::literal(callable(&stmt)));
 }
 
 

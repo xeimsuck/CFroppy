@@ -10,8 +10,8 @@
     @data 16.11.24
  */
 
-namespace cfp::interpreting {
-    class interpreter;
+namespace cfp::ast::stmt {
+    struct function;
 }
 
 namespace cfp::scan {
@@ -20,16 +20,22 @@ namespace cfp::scan {
     namespace types {
         class callable {
         public:
-            using native = std::function<literal(interpreting::interpreter*, const std::vector<literal>&)>;
+            using native = std::function<literal(const std::vector<literal>&)>;
             static constexpr int variadic_arity = -1;
+            static constexpr int max_arity = 255;
 
             callable(int arity, native func);
+            explicit callable(ast::stmt::function* declaration);
+
+            [[nodiscard]] bool isNative() const;
+            native getNative();
+            ast::stmt::function* getDeclaration() const;
             [[nodiscard]] int arity() const;
-            literal call(interpreting::interpreter* interpreter, const std::vector<literal>& arguments) const;
 
         private:
             int arity_=0;
             native native_=nullptr;
+            ast::stmt::function* declaration = nullptr;
         };
 
         using boolean = bool;

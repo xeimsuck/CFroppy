@@ -1,5 +1,8 @@
 #include "literal.hpp"
 #include <format>
+
+#include "../ast/stmt/function.hpp"
+#include "../interpreting/interpreter.hpp"
 #include "../interpreting/runtime_error.hpp"
 
 using namespace cfp;
@@ -9,19 +12,25 @@ using namespace cfp::scan::types;
 callable::callable(const int arity, native func) : arity_(arity), native_(std::move(func)) {
 }
 
+callable::callable(ast::stmt::function *declaration) : declaration(declaration) {
+    arity_ = static_cast<int>(this->declaration->params.size());
+}
+
+
 int callable::arity() const {
     return arity_;
 }
 
+bool callable::isNative() const {
+    return native_!=nullptr;
+}
 
-literal callable::call(interpreting::interpreter *interpreter, const std::vector<literal> &arguments) const {
-    if(arity_!=variadic_arity && arguments.size()!=arity_) {
-        throw interpreting::runtime_error(std::format("Expected {} arguments but got {}\n", arity_, arguments.size()));
-    }
-    if(native_) {
-        return native_(interpreter, arguments);
-    }
-    return scan::literal{};
+ast::stmt::function *callable::getDeclaration() const {
+    return declaration;
+}
+
+callable::native callable::getNative() {
+    return native_;
 }
 
 
@@ -144,7 +153,11 @@ std::string literal::stringify() const {
     if(has<string>()) return getString();
     if(has<integer>()) return std::to_string(getInteger());
     if(has<decimal>()) return std::to_string(getDecimal());
-    if(has<callable>()) return "callable";
+    if(has<callable>()) {
+        auto fn = getCallable();
+        if(fn.isNative()) return "<fn native>";
+        return std::format("<fn {}>", fn.getDeclaration()->name.lexeme);
+    }
     return "nil";
 }
 

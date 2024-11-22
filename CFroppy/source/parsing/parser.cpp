@@ -288,8 +288,8 @@ std::unique_ptr<expr::expression> parser::finishCall(std::unique_ptr<expr::expre
 
 	if(!check(RIGHT_PAREN)) {
 		do {
-			if(arguments.size()>=255) {
-				error(peek(), "Can't have more than 255 arguments.");
+			if (arguments.size() >= types::callable::max_arity) {
+				error(peek(), std::format("Can't have more than {} arguments.", types::callable::max_arity));
 			}
 			arguments.push_back(this->expr());
 		} while (match(COMMA));
@@ -400,6 +400,7 @@ std::unique_ptr<stmt::statement> parser::statement() {
 	if(match(LEFT_BRACE)) return block();
 	if(match(IF)) return ifStatement();
 	if(match(WHILE)) return whileStatement();
+	if(match(FN)) return function("function");
 	if(match(FOR)) return forStatement();
 	if(match(BREAK)) return breakStatement();
     return expressionStatement();
@@ -431,6 +432,34 @@ std::unique_ptr<stmt::expression> parser::expressionStatement() {
     decltype(auto) expr = this->expr();
     consume(SEMICOLON, "Expect ; after expression.");
     return std::make_unique<stmt::expression>(std::move(expr));
+}
+
+
+/*!
+ * @brief parse function
+ * @param kind kind of function (class method or function)
+ * @return function statement
+ */
+std::unique_ptr<stmt::function> parser::function(const std::string &kind) {
+	auto name = consume(IDENTIFIER, std::format("Expect {} name.", kind));
+
+	consume(LEFT_PAREN, std::format("Expect '(' after {} name.", kind));
+
+	std::vector<token> params;
+	if(!check(RIGHT_PAREN)) {
+		do {
+			if (params.size() >= types::callable::max_arity) {
+				error(peek(), std::format("Can't have more than {} parameters.", types::callable::max_arity));
+			}
+			params.push_back(consume(IDENTIFIER, "Expect parameter name."));
+		} while (match(COMMA));
+	}
+
+	consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+	consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+	const auto body = block();
+	return std::make_unique<stmt::function>(std::move(name), std::move(params), std::move(body->statements));
 }
 
 

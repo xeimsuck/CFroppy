@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
+#include "../token/token.hpp"
 #include "../ast/expr/exprVisitor.hpp"
 #include "../ast/stmt/stmtVisitor.hpp"
 #include "../io/reporter.hpp"
-#include "../token/token.hpp"
 
 namespace cfp::parse {
     /*!
@@ -33,6 +33,7 @@ namespace cfp::parse {
         std::unique_ptr<ast::stmt::block> block();
         std::unique_ptr<ast::stmt::statement> statement();
         std::unique_ptr<ast::stmt::expression> expressionStatement();
+        std::unique_ptr<ast::stmt::function> function(const std::string& kind);
         std::unique_ptr<ast::stmt::if_else> ifStatement();
         std::unique_ptr<ast::stmt::loop> whileStatement();
         std::unique_ptr<ast::stmt::loop> forStatement();
