@@ -206,9 +206,9 @@ std::unique_ptr<expr::expression> parser::term() {
     decltype(auto) expr = factor();
 
     while (match(PLUS, MINUS)) {
-        decltype(auto) oper = previous();
-        decltype(auto) right = factor();
-        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), oper);
+        auto oper = previous();
+        auto right = factor();
+        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), std::move(oper));
     }
 
     return expr;
@@ -223,9 +223,9 @@ std::unique_ptr<expr::expression> parser::factor() {
     decltype(auto) expr = binary_assignment();
 
     while (match(STAR, SLASH)) {
-        decltype(auto) oper = previous();
-        decltype(auto) right = unary();
-        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), oper);
+        auto oper = previous();
+        auto right = unary();
+        expr = std::make_unique<expr::binary>(std::move(expr), std::move(right), std::move(oper));
     }
 
     return expr;
@@ -260,8 +260,8 @@ std::unique_ptr<expr::expression> parser::binary_assignment() {
  */
 std::unique_ptr<expr::expression> parser::unary() {
     if(match(BANG, MINUS)) {
-        decltype(auto) oper = previous();
-        return std::make_unique<expr::unary>(call(), oper);
+        auto oper = previous();
+        return std::make_unique<expr::unary>(call(), std::move(oper));
     }
 
     return call();
