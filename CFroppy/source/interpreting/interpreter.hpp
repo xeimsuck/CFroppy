@@ -24,7 +24,7 @@ namespace cfp::interpreting {
                               public ast::stmt::stmtVisitor {
     public:
         explicit interpreter(const io::reporter& reporter);
-        void interpret(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts);
+        int interpret(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts);
 
         scan::literal visit(ast::expr::unary &expr) override;
         scan::literal visit(ast::expr::literal &expr) override;

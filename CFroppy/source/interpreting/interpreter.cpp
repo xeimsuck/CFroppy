@@ -211,18 +211,25 @@ interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env
  * @brief execute statements
  * @param stmts list of parsed statements
  */
-void interpreter::interpret(const std::vector<std::unique_ptr<ast::stmt::statement>> &stmts) {
+int interpreter::interpret(const std::vector<std::unique_ptr<ast::stmt::statement>> &stmts) {
     try {
         for(decltype(auto) stmt : stmts) {
             execute(stmt);
         }
     } catch (const break_throw&) {
 		reporter.runtime_error("'break' must be used in loop.");
-    } catch (const return_throw&){
-    	reporter.runtime_error("'return' must be used in callable objects.");
+    } catch (const return_throw& val){
+		const auto v = val.value.toInteger();
+    	if(!v.has<integer>()) {
+    		reporter.runtime_error("'return' in global scope must return an integer type.");
+    		return -1;
+    	}
+    	return static_cast<int>(v.getInteger());
 	} catch (const runtime_error& ex) {
         reporter.runtime_error(ex);
+		return -1;
     }
+	return 0;
 }
 
 /*!

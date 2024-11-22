@@ -31,11 +31,16 @@ int cfroppy::run(const int argc, char **argv) {
         return 1;
     }
     try {
-        return argc == 1 ? prompt() : executeFile(argv[1]);
+        if(argc==1) prompt();
+        else {
+            auto code = executeFile(argv[1]);
+            std::cout << std::endl << std::format("Process finished with exit code {}.", code);
+        }
     } catch (const std::exception& ex) {
         std::cerr << ex.what();
         return 1;
     }
+    return 0;
 }
 
 
@@ -51,12 +56,10 @@ int cfroppy::execute(const std::string &source) {
     parse::parser parser(tokens, reporter);
     const auto stmts = parser.parse();
 
-    if(!reporter.getHadError()) {
-        interpreting::interpreter interpreter(reporter);
-        interpreter.interpret(stmts);
-    }
+    if(reporter.getHadError()) return -3;
 
-    return reporter.getHadError()?1:0;
+    interpreting::interpreter interpreter(reporter);
+    return interpreter.interpret(stmts);
 }
 
 
