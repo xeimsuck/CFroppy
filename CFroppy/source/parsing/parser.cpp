@@ -402,6 +402,7 @@ std::unique_ptr<stmt::statement> parser::statement() {
 	if(match(WHILE)) return whileStatement();
 	if(match(FN)) return function("function");
 	if(match(FOR)) return forStatement();
+	if(match(RETURN)) return returnStatement();
 	if(match(BREAK)) return breakStatement();
     return expressionStatement();
 }
@@ -525,6 +526,24 @@ std::unique_ptr<stmt::loop> parser::forStatement() {
 
 	return std::make_unique<stmt::loop>(std::move(initializer), std::move(conditional), std::move(increment), std::move(body));
 }
+
+
+/*!
+ * @brief parse return
+ */
+std::unique_ptr<stmt::return_fn> parser::returnStatement() {
+	auto keyword = previous();
+
+	std::unique_ptr<expr::expression> value;
+	if(!check(SEMICOLON)) {
+		value = expr();
+	}
+
+	consume(SEMICOLON, "Expect ';' after return value.");
+
+	return std::make_unique<stmt::return_fn>(std::move(keyword), std::move(value));
+}
+
 
 
 /*!

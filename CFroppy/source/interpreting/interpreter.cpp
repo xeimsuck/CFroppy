@@ -14,6 +14,9 @@ using namespace scan::types;
 using enum scan::token::tokenType;
 
 struct break_throw {};
+struct return_throw {
+	scan::literal value;
+};
 
 namespace native {
 	/*!
@@ -201,9 +204,11 @@ void interpreter::interpret(const std::vector<std::unique_ptr<ast::stmt::stateme
         for(decltype(auto) stmt : stmts) {
             execute(stmt);
         }
-    } catch (break_throw) {
-	  reporter.runtime_error("'break' must be used in loop.");
-    } catch (const runtime_error& ex) {
+    } catch (const break_throw&) {
+		reporter.runtime_error("'break' must be used in loop.");
+    } catch (const return_throw&){
+    	reporter.runtime_error("'return' must be used in callable objects.");
+	} catch (const runtime_error& ex) {
         reporter.runtime_error(ex);
     }
 }
@@ -230,6 +235,32 @@ void interpreter::executeBlock(const std::vector<std::unique_ptr<ast::stmt::stat
 	});
 
 	std::swap(env, newEnv);
+}
+
+
+/*!
+ * @brief execute function
+ * @param func function to execute
+ * @param arguments arguments
+ * @brief function return value
+ */
+scan::literal interpreter::executeFunction(callable func, const std::vector<scan::literal>& arguments) {
+	if(func.isNative()) return func.getNative()(arguments);
+
+
+	auto funcEnv = std::make_unique<environment>(env.get());
+	const auto declaration = func.getDeclaration();
+
+	for(int i = 0; i < declaration->params.size(); ++i) {
+		funcEnv->define(declaration->params[i].lexeme, arguments[i]);
+	}
+
+	try {
+		executeBlock(declaration->body, std::move(funcEnv));
+	} catch (const return_throw& return_val) {
+		return return_val.value;
+	}
+	return scan::literal{};
 }
 
 
@@ -349,19 +380,7 @@ scan::literal interpreter::visit(ast::expr::call &expr) {
 		throw runtime_error("Can only call functions and classes.");
 	}
 
-	decltype(auto) func = callee.getCallable();
-	if(func.isNative()) return func.getNative()(arguments);
-
-
-	auto funcEnv = std::make_unique<environment>(env.get());
-	auto declaration = func.getDeclaration();
-
-	for(int i = 0; i < declaration->params.size(); ++i) {
-		funcEnv->define(declaration->params[i].lexeme, arguments[i]);
-	}
-
-	executeBlock(declaration->body, std::move(funcEnv));
-	return scan::literal{};
+	return executeFunction(callee.getCallable(), arguments);
 }
 
 
@@ -432,10 +451,18 @@ void interpreter::visit(ast::stmt::break_loop &stmt) {
 
 
 /*!
- * @brief declarate function
+ * @brief define function
  */
 void interpreter::visit(ast::stmt::function &stmt) {
 	env->define(stmt.name.lexeme, scan::literal(callable(&stmt)));
+}
+
+
+/*!
+ * @brief return
+ */
+void interpreter::visit(ast::stmt::return_fn &stmt) {
+	throw return_throw(evaluate(stmt.value));
 }
 
 

@@ -7,6 +7,8 @@
 #include "loop.hpp"
 #include "break_loop.hpp"
 #include "function.hpp"
+#include "return.hpp"
+
 
 namespace cfp::ast::stmt {
 	/*!
@@ -25,5 +27,6 @@ namespace cfp::ast::stmt {
 		virtual void visit(loop& stmt) = 0;
 		virtual void visit(break_loop& stmt) = 0;
 		virtual void visit(function& stmt) = 0;
+		virtual void visit(return_fn& stmt) = 0;
 	};
 }
