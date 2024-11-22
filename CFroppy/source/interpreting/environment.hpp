@@ -9,13 +9,17 @@
 	@data 16.11.24
  */
 
+namespace cfp::scan {
+	class literal;
+}
+
 namespace cfp::interpreting {
 	/*!
 	@brief represent program environment
 	 */
 	class environment {
 	public:
-		explicit environment(environment* enclosing = nullptr);
+		explicit environment(std::shared_ptr<environment> enclosing = nullptr);
 		environment(const environment&) = delete;
 		environment& operator=(const environment&) = delete;
 		environment(environment&& env) noexcept;
@@ -37,6 +41,6 @@ namespace cfp::interpreting {
 	public:
 		scan::literal& consume(const std::string& name);
 		std::unordered_map<std::string, scan::literal> values;
-		environment* enclosing = nullptr;
+		std::shared_ptr<environment> enclosing = nullptr;
 	};
 }

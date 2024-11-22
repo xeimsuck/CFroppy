@@ -1,6 +1,6 @@
 #include "literal.hpp"
 #include <format>
-
+#include <utility>
 #include "../ast/stmt/function.hpp"
 #include "../interpreting/interpreter.hpp"
 #include "../interpreting/runtime_error.hpp"
@@ -12,7 +12,8 @@ using namespace cfp::scan::types;
 callable::callable(const int arity, native func) : arity_(arity), native_(std::move(func)) {
 }
 
-callable::callable(ast::stmt::function *declaration) : declaration(declaration) {
+callable::callable(ast::stmt::function *declaration, std::shared_ptr<interpreting::environment> closure)
+            : declaration(declaration), closure(std::move(closure)) {
     arity_ = static_cast<int>(this->declaration->params.size());
 }
 
@@ -28,6 +29,11 @@ bool callable::isNative() const {
 ast::stmt::function *callable::getDeclaration() const {
     return declaration;
 }
+
+std::shared_ptr<interpreting::environment> callable::getClosure() const {
+    return closure;
+}
+
 
 callable::native callable::getNative() {
     return native_;

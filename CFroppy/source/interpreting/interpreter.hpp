@@ -47,12 +47,12 @@ namespace cfp::interpreting {
 
     private:
         void execute(const std::unique_ptr<ast::stmt::statement>& stmt);
-        void executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::unique_ptr<environment>&& env);
+        void executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::shared_ptr<environment> env);
         scan::literal executeFunction(scan::types::callable func, const std::vector<scan::literal>& arguments);
 
         scan::literal evaluate(const std::unique_ptr<ast::expr::expression>& expr);;
 
         const io::reporter& reporter;
-        std::unique_ptr<environment> env;
+        std::shared_ptr<environment> env;
     };
 }

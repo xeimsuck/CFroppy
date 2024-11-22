@@ -2,6 +2,8 @@
 #include <string>
 #include <variant>
 #include <functional>
+#include <memory>
+#include "../interpreting/environment.hpp"
 
 /*!
     @file
@@ -12,6 +14,10 @@
 
 namespace cfp::ast::stmt {
     struct function;
+}
+
+namespace cfp::interpreting {
+    class environment;
 }
 
 namespace cfp::scan {
@@ -25,17 +31,19 @@ namespace cfp::scan {
             static constexpr int max_arity = 255;
 
             callable(int arity, native func);
-            explicit callable(ast::stmt::function* declaration);
+            explicit callable(ast::stmt::function* declaration, std::shared_ptr<interpreting::environment> closure);
 
             [[nodiscard]] bool isNative() const;
             native getNative();
-            ast::stmt::function* getDeclaration() const;
+            [[nodiscard]] ast::stmt::function* getDeclaration() const;
+            [[nodiscard]] std::shared_ptr<interpreting::environment> getClosure() const;
             [[nodiscard]] int arity() const;
 
         private:
             int arity_=0;
             native native_=nullptr;
             ast::stmt::function* declaration = nullptr;
+            std::shared_ptr<interpreting::environment> closure;
         };
 
         using boolean = bool;

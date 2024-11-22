@@ -225,9 +225,10 @@ void interpreter::execute(const std::unique_ptr<ast::stmt::statement> &stmt) {
 /*!
  * @brief execute block of statements
  * @param stmts statements
+ * @param newEnv environment
  * @param env environment
  */
-void interpreter::executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::unique_ptr<environment>&& newEnv) {
+void interpreter::executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::shared_ptr<environment> newEnv) {
 	std::swap(env, newEnv);
 
 	std::ranges::for_each(stmts, [this](auto&& stmt) {
@@ -248,7 +249,7 @@ scan::literal interpreter::executeFunction(callable func, const std::vector<scan
 	if(func.isNative()) return func.getNative()(arguments);
 
 
-	auto funcEnv = std::make_unique<environment>(env.get());
+	auto funcEnv = std::make_unique<environment>(func.getClosure());
 	const auto declaration = func.getDeclaration();
 
 	for(int i = 0; i < declaration->params.size(); ++i) {
@@ -407,7 +408,7 @@ void interpreter::visit(ast::stmt::var &stmt) {
  * @brief execute block of statements
  */
 void interpreter::visit(ast::stmt::block &stmt) {
-	executeBlock(stmt.statements, std::make_unique<environment>(env.get()));
+	executeBlock(stmt.statements, std::make_shared<environment>(env));
 }
 
 
@@ -427,7 +428,7 @@ void interpreter::visit(ast::stmt::if_else &stmt) {
  * @brief execute while loop
  */
 void interpreter::visit(ast::stmt::loop &stmt) {
-	auto loopEnv = std::make_unique<environment>(env.get());
+	auto loopEnv = std::make_shared<environment>(env);
 	std::swap(env, loopEnv);
 
 	if(stmt.initializer) stmt.initializer->accept(*this);
@@ -454,7 +455,7 @@ void interpreter::visit(ast::stmt::break_loop &stmt) {
  * @brief define function
  */
 void interpreter::visit(ast::stmt::function &stmt) {
-	env->define(stmt.name.lexeme, scan::literal(callable(&stmt)));
+	env->define(stmt.name.lexeme, scan::literal(callable(&stmt, env)));
 }
 
 

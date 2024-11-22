@@ -10,7 +10,7 @@ using namespace cfp::interpreting;
 /*!
  * @param enclosing enclosing environment
  */
-environment::environment(environment *enclosing) : enclosing(enclosing) {
+environment::environment(std::shared_ptr<environment> enclosing) : enclosing(std::move(enclosing)) {
 }
 
 
