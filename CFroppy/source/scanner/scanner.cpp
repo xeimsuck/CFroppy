@@ -21,7 +21,7 @@ static std::unordered_map<std::string, token::tokenType> keywords{
     {"super",  SUPER},
     {"this",   THIS},
     {"true",   TRUE},
-    {"var",    VAR},
+    {"let",    LET},
     {"while",  WHILE},
     {"break",  BREAK}
 };

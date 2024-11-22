@@ -1,8 +1,8 @@
 print("input count of iterations: ");
-var count = to_integer(input());
+let count = to_integer(input());
 
-var begin = clock(); // start
-for(var x = 0; x < count; x+=1) {
+let begin = clock(); // start
+for(let x = 0; x < count; x+=1) {
 }
 var end = clock(); // end
 

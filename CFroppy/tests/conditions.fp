@@ -1,4 +1,4 @@
-var x = to_integer(input());
+let x = to_integer(input());
 
 /// if(x===nil) {
 ///     eprint("x is not integer"); // error: x must be integer

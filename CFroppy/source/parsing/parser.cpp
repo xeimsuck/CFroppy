@@ -342,7 +342,7 @@ void parser::synchronize() {
         switch (peek().type) {
             case CLASS:
             case FN:
-            case VAR:
+            case LET:
             case FOR:
             case IF:
             case WHILE:
@@ -362,7 +362,7 @@ void parser::synchronize() {
  */
 std::unique_ptr<stmt::statement> parser::declaration() {
 	try {
-		if(match(VAR)) {
+		if(match(LET)) {
 			return varDeclaration();
 		}
 		return statement();
@@ -476,7 +476,7 @@ std::unique_ptr<stmt::loop> parser::forStatement() {
 
 	std::unique_ptr<stmt::statement> initializer;
 	if(!match(SEMICOLON)) {
-		if(match(VAR)) initializer = varDeclaration();
+		if(match(LET)) initializer = varDeclaration();
 		else initializer = expressionStatement();
 	}
 
