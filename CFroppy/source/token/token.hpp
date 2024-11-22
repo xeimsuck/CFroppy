@@ -33,7 +33,7 @@ namespace cfp::scan {
 
             // Keywords.
             AND, CLASS, ELSE, FALSE, FN, FOR, IF, NIL, OR,
-            RETURN, SUPER, THIS, TRUE, LET, WHILE, BREAK,
+            RETURN, SUPER, THIS, TRUE, LET, WHILE, BREAK, LOOP,
 
             END_OF_FILE
         };

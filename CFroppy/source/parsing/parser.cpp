@@ -400,8 +400,9 @@ std::unique_ptr<stmt::statement> parser::statement() {
 	if(match(LEFT_BRACE)) return block();
 	if(match(IF)) return ifStatement();
 	if(match(WHILE)) return whileStatement();
-	if(match(FN)) return function("function");
 	if(match(FOR)) return forStatement();
+	if(match(LOOP)) return loopStatement();
+	if(match(FN)) return function("function");
 	if(match(RETURN)) return returnStatement();
 	if(match(BREAK)) return breakStatement();
     return expressionStatement();
@@ -526,6 +527,17 @@ std::unique_ptr<stmt::loop> parser::forStatement() {
 
 	return std::make_unique<stmt::loop>(std::move(initializer), std::move(conditional), std::move(increment), std::move(body));
 }
+
+
+/*!
+ * @brief parse loop
+ */
+std::unique_ptr<stmt::loop> parser::loopStatement() {
+	auto body = statement();
+
+	return std::make_unique<stmt::loop>(nullptr, std::make_unique<expr::literal>(literal{true}), nullptr, std::move(body));
+}
+
 
 
 /*!

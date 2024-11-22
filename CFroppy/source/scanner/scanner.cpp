@@ -8,22 +8,23 @@ using namespace cfp::scan;
 using enum token::tokenType;
 
 static std::unordered_map<std::string, token::tokenType> keywords{
-    {"and",    AND},
-    {"class",  CLASS},
-    {"else",   ELSE},
-    {"false",  FALSE},
-    {"for",    FOR},
-    {"fn",     FN},
-    {"if",     IF},
-    {"nil",    NIL},
-    {"or",     OR},
-    {"return", RETURN},
-    {"super",  SUPER},
-    {"this",   THIS},
-    {"true",   TRUE},
-    {"let",    LET},
-    {"while",  WHILE},
-    {"break",  BREAK}
+    {"and",     AND},
+    {"class",   CLASS},
+    {"else",    ELSE},
+    {"false",   FALSE},
+    {"for",     FOR},
+    {"fn",      FN},
+    {"if",      IF},
+    {"nil",     NIL},
+    {"or",      OR},
+    {"return",  RETURN},
+    {"super",   SUPER},
+    {"this",    THIS},
+    {"true",    TRUE},
+    {"let",     LET},
+    {"while",   WHILE},
+    {"loop",    LOOP},
+    {"break",   BREAK}
 };
 
 /*!

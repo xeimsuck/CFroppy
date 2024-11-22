@@ -37,6 +37,7 @@ namespace cfp::parse {
         std::unique_ptr<ast::stmt::if_else> ifStatement();
         std::unique_ptr<ast::stmt::loop> whileStatement();
         std::unique_ptr<ast::stmt::loop> forStatement();
+        std::unique_ptr<ast::stmt::loop> loopStatement();
         std::unique_ptr<ast::stmt::return_fn> returnStatement();
         std::unique_ptr<ast::stmt::break_loop> breakStatement();
 
