@@ -91,6 +91,7 @@ namespace cfp::scan {
         void setNil();
 
         [[nodiscard]] std::string stringify() const;
+        [[nodiscard]] std::string getType() const;
 
         // equality
         bool operator==(const literal & rhs) const;

@@ -168,6 +168,16 @@ std::string literal::stringify() const {
 }
 
 
+std::string literal::getType() const {
+    if(has<boolean>()) return "boolean";
+    if(has<string>()) return "string";
+    if(has<integer>()) return "integer";
+    if(has<decimal>()) return "decimal";
+    return stringify();
+}
+
+
+
 bool literal::operator==(const literal &rhs) const {
     if(has<integer>()) {
         if(rhs.has<integer>()) return getInteger() == rhs.getInteger();

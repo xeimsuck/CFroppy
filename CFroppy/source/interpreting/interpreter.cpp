@@ -161,6 +161,15 @@ namespace native {
 	callable::native to_boolean = [](const std::vector<scan::literal>& vars) {
 		return vars[0].toBoolean();
 	};
+
+
+	/*!
+	 * @brief return true if variable is instance of type
+	 */
+	callable::native is_instance = [](const std::vector<scan::literal>& vars) {
+		if(!vars[1].has<string>()) return scan::literal{};
+		return scan::literal{vars[0].getType()==vars[1].getString()};
+	};
 }
 
 
@@ -169,7 +178,7 @@ namespace native {
  * @param reporter reporter
  */
 interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env(std::make_unique<environment>()) {
-	// i/o stream
+	// io stream
 	env->define("print", scan::literal(callable(1, native::print)));
 	env->define("println", scan::literal(callable(1, native::println)));
 	env->define("eprint", scan::literal(callable(1, native::eprint)));
@@ -193,6 +202,9 @@ interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env
 	env->define("to_decimal", scan::literal(callable(1, native::to_decimal)));
 	env->define("to_integer", scan::literal(callable(1, native::to_integer)));
 	env->define("to_boolean", scan::literal(callable(1, native::to_boolean)));
+
+	// other
+	env->define("is_instance", scan::literal(callable(2, native::is_instance)));
 }
 
 /*!
