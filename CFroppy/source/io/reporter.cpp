@@ -92,5 +92,5 @@ void reporter::parse_report(const int line, const std::string& where, const std:
  * @brief report runtime errors
  */
 void reporter::runtime_report(const std::string &msg) const {
-    report(std::format("Error: {}", msg), true);
+    report(std::format("Error: {}\n", msg), true);
 }
