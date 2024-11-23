@@ -204,9 +204,27 @@ bool scanner::isAlpha(const char ch) {
  * @brief add string literal token
  */
 void scanner::string() {
+    std::string value;
     while (!isAtEnd() && peek()!='\"') {
         if(peek()=='\n') ++line;
-        advance();
+        else if(peek()=='\\') {
+            advance();
+            switch (peek()) {
+                case '\\': value.push_back('\\'); break;
+                case 'n': value.push_back('\n'); break;
+                case 'a': value.push_back('\a'); break;
+                case 'r': value.push_back('\r'); break;
+                case 'v': value.push_back('\v'); break;
+                case 't': value.push_back('\t'); break;
+                case 'b': value.push_back('\b'); break;
+                case 'f': value.push_back('\f'); break;
+                case '"': value.push_back('"'); break;
+                default: reporter.parse_error(line, "", std::format("Unknown escape sequence '\\{}", peek()));
+            }
+            advance();
+        } else {
+            value.push_back(advance());
+        }
     }
 
     if(isAtEnd()) {
@@ -218,7 +236,6 @@ void scanner::string() {
     advance();
 
     // Add token
-    auto value = source.substr(start+1, current-start-2);
     addToken(STRING, literal(std::move(value)));
 }
 
