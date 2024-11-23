@@ -188,25 +188,34 @@ std::string literal::stringify() const {
     if(has<integer>()) return std::to_string(getInteger());
     if(has<decimal>()) return std::to_string(getDecimal());
     if(has<callable>()) {
-        const auto fn = getCallable();
-        return fn.isNative() ? "<fn native>" :  fn.getDeclaration()->name.lexeme;
+        return std::format("<fn {}>", getType());
     }
-    if(has<instance>()) {
-        return getInstance().name;
+    if (has<constructor>()) {
+        return std::format("<class {}>", getConstructor().name);
     }
-    if(has<constructor>()) {
-        return getConstructor().name;
+    if (has<instance>()) {
+        return std::format("<instance {}>", getInstance().name);
     }
     return "nil";
 }
 
 
 std::string literal::getType() const {
+    if(has<callable>()) {
+        const auto fn = getCallable();
+        return fn.isNative() ? "native" :  fn.getDeclaration()->name.lexeme;
+    }
+    if(has<constructor>()) {
+        return getConstructor().name;
+    }
+    if(has<instance>()) {
+        return getInstance().name;
+    }
     if(has<boolean>()) return "boolean";
     if(has<string>()) return "string";
     if(has<integer>()) return "integer";
     if(has<decimal>()) return "decimal";
-    return stringify();
+    return "nil";
 }
 
 
