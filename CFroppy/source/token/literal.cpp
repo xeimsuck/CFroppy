@@ -40,14 +40,14 @@ callable::native callable::getNative() {
 }
 
 
-instance::instance(const ast::stmt::class_* declaration, std::shared_ptr<interpreting::environment> enclosing) {
-    environment = std::make_shared<interpreting::environment>(std::move(enclosing));
+constructor::constructor(std::shared_ptr<interpreting::environment> environment, std::string name)
+            : name(std::move(name)), environment(std::move(environment)) {
+}
 
-    name = declaration->name.lexeme;
 
-    for(decltype(auto) method : declaration->methods) {
-        environment->define(method->name.lexeme, literal(callable(method.get(), environment)));
-    }
+instance::instance(const std::shared_ptr<interpreting::environment>& classEnv, std::string name) : name(std::move(name)) {
+    environment = std::make_shared<interpreting::environment>(classEnv->enclosing);
+    environment->values = classEnv->values;
 }
 
 
@@ -67,6 +67,9 @@ literal::literal(string val) : value(std::move(val)){
 }
 
 literal::literal(callable val) : value(std::move(val)) {
+}
+
+literal::literal(constructor val) : value(std::move(val)) {
 }
 
 literal::literal(instance val) : value(std::move(val)) {
@@ -142,9 +145,14 @@ callable literal::getCallable() const {
     return std::get<callable>(value);
 }
 
+constructor literal::getConstructor() const {
+    return std::get<constructor>(value);
+}
+
 instance literal::getInstance() const {
     return std::get<instance>(value);
 }
+
 
 
 
@@ -180,9 +188,14 @@ std::string literal::stringify() const {
     if(has<integer>()) return std::to_string(getInteger());
     if(has<decimal>()) return std::to_string(getDecimal());
     if(has<callable>()) {
-        auto fn = getCallable();
-        if(fn.isNative()) return "<fn native>";
-        return std::format("<fn {}>", fn.getDeclaration()->name.lexeme);
+        const auto fn = getCallable();
+        return fn.isNative() ? "<fn native>" :  fn.getDeclaration()->name.lexeme;
+    }
+    if(has<instance>()) {
+        return getInstance().name;
+    }
+    if(has<constructor>()) {
+        return getConstructor().name;
     }
     return "nil";
 }

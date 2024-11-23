@@ -26,18 +26,19 @@ namespace cfp::interpreting {
         explicit interpreter(const io::reporter& reporter);
         int interpret(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts);
 
+        scan::literal visit(ast::expr::binary &expr) override;
         scan::literal visit(ast::expr::unary &expr) override;
         scan::literal visit(ast::expr::literal &expr) override;
         scan::literal visit(ast::expr::grouping &expr) override;
-        scan::literal visit(ast::expr::binary &expr) override;
         scan::literal visit(ast::expr::variable &expr) override;
         scan::literal visit(ast::expr::assign &expr) override;
         scan::literal visit(ast::expr::binary_assign &expr) override;
         scan::literal visit(ast::expr::logical &expr) override;
         scan::literal visit(ast::expr::call &expr) override;
+        scan::literal visit(ast::expr::member &expr) override;
 
         void visit(ast::stmt::expression &stmt) override;
-        void visit(ast::stmt::var &stmt) override;
+        void visit(ast::stmt::let &stmt) override;
         void visit(ast::stmt::block &stmt) override;
         void visit(ast::stmt::if_else &stmt) override;
         void visit(ast::stmt::loop &stmt) override;
@@ -50,7 +51,7 @@ namespace cfp::interpreting {
         void execute(const std::unique_ptr<ast::stmt::statement>& stmt);
         void executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::shared_ptr<environment> env);
         scan::literal executeFunction(scan::types::callable func, const std::vector<scan::literal>& arguments);
-        scan::literal executeInstance(scan::types::instance inst, const std::vector<scan::literal>& arguments);
+        static scan::literal executeInstance(const scan::types::constructor& inst, const std::vector<scan::literal>& arguments);
 
         scan::literal evaluate(const std::unique_ptr<ast::expr::expression>& expr);
 

@@ -79,13 +79,19 @@ scan::literal environment::get(const std::string &name) {
 }
 
 
+bool environment::contain(const std::string &name) const {
+	return values.contains(name);
+}
+
+
+
 /*!
  * @brief if variable defined return value otherwise runtime error
  * @param name variable name
  * @return variable value
  */
 scan::literal &environment::consume(const std::string &name) {
-	if(values.contains(name)) return values[name];
+	if(contain(name)) return values[name];
 	if(enclosing) return enclosing->consume(name);
 
 	throw runtime_error(std::format("Undefined variable '{}'.", name));

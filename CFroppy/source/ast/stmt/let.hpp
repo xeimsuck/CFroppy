@@ -8,8 +8,8 @@ namespace cfp::ast::stmt {
 	/*!
 	@brief represent var initialization
 	 */
-	struct var final : statement {
-		explicit var(scan::token name, std::unique_ptr<expr::expression>&& initializer);
+	struct let final : statement {
+		explicit let(scan::token name, std::unique_ptr<expr::expression>&& initializer);
 
 		void accept(stmtVisitor &visitor) override;
 

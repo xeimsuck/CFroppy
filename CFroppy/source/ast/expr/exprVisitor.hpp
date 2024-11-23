@@ -9,6 +9,7 @@
 #include "binary_assign.hpp"
 #include "logical.hpp"
 #include "call.hpp"
+#include "member.hpp"
 
 
 namespace cfp::ast::expr {
@@ -29,5 +30,6 @@ namespace cfp::ast::expr {
 		virtual scan::literal visit(binary_assign& expr) = 0;
 		virtual scan::literal visit(logical& expr) = 0;
 		virtual scan::literal visit(call& expr) = 0;
+		virtual scan::literal visit(member& expr) = 0;
 	};
 }

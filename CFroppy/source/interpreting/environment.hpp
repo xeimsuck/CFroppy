@@ -37,6 +37,7 @@ namespace cfp::interpreting {
 		void undefine(const std::string& name);
 		scan::literal assign(const std::string& name, scan::literal value);
 		scan::literal get(const std::string& name);
+		bool contain(const std::string& name) const;
 
 	public:
 		scan::literal& consume(const std::string& name);

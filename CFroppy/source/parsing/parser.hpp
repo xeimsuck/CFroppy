@@ -26,10 +26,11 @@ namespace cfp::parse {
         std::unique_ptr<ast::expr::expression> binary_assignment();
         std::unique_ptr<ast::expr::expression> unary();
         std::unique_ptr<ast::expr::expression> call();
+        std::unique_ptr<ast::expr::expression> member();
         std::unique_ptr<ast::expr::expression> primary();
 
         std::unique_ptr<ast::stmt::statement> declaration();
-        std::unique_ptr<ast::stmt::var> varDeclaration();
+        std::unique_ptr<ast::stmt::let> letDeclaration();
         std::unique_ptr<ast::stmt::block> block();
         std::unique_ptr<ast::stmt::statement> statement();
         std::unique_ptr<ast::stmt::expression> expressionStatement();

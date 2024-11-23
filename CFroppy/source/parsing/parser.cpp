@@ -273,7 +273,7 @@ std::unique_ptr<expr::expression> parser::unary() {
  * @return expression
  */
 std::unique_ptr<expr::expression> parser::call() {
-	auto expr = primary();
+	auto expr = member();
 
 	while(match(LEFT_PAREN)) {
 		expr = finishCall(std::move(expr));
@@ -283,23 +283,20 @@ std::unique_ptr<expr::expression> parser::call() {
 }
 
 
-std::unique_ptr<expr::expression> parser::finishCall(std::unique_ptr<expr::expression> &&callee) {
-	std::vector<std::unique_ptr<expr::expression>> arguments;
+/*!
+ * @brief parse sub productions
+ * @return expression
+ */
+std::unique_ptr<expr::expression> parser::member() {
+	decltype(auto) expr = primary();
 
-	if(!check(RIGHT_PAREN)) {
-		do {
-			if (arguments.size() >= types::callable::max_arity) {
-				error(peek(), std::format("Can't have more than {} arguments.", types::callable::max_arity));
-			}
-			arguments.push_back(this->expr());
-		} while (match(COMMA));
+	while (match(DOT)) {
+		auto mem = primary();
+		expr = std::make_unique<expr::member>(std::move(expr), std::move(mem));
 	}
 
-	decltype(auto) paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
-
-	return std::make_unique<expr::call>(std::move(callee), paren, std::move(arguments));
+	return expr;
 }
-
 
 
 /*!
@@ -328,6 +325,25 @@ std::unique_ptr<expr::expression> parser::primary() {
     throw error(peek(), "Expect expression.");
 }
 
+
+
+
+std::unique_ptr<expr::expression> parser::finishCall(std::unique_ptr<expr::expression> &&callee) {
+	std::vector<std::unique_ptr<expr::expression>> arguments;
+
+	if(!check(RIGHT_PAREN)) {
+		do {
+			if (arguments.size() >= types::callable::max_arity) {
+				error(peek(), std::format("Can't have more than {} arguments.", types::callable::max_arity));
+			}
+			arguments.push_back(this->expr());
+		} while (match(COMMA));
+	}
+
+	decltype(auto) paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+	return std::make_unique<expr::call>(std::move(callee), paren, std::move(arguments));
+}
 
 
 /*!
@@ -363,7 +379,7 @@ void parser::synchronize() {
 std::unique_ptr<stmt::statement> parser::declaration() {
 	try {
 		if(match(LET)) {
-			return varDeclaration();
+			return letDeclaration();
 		}
 		return statement();
 	} catch (const parse_error& ex) {
@@ -377,7 +393,7 @@ std::unique_ptr<stmt::statement> parser::declaration() {
  * @brief parse variable declaration
  * @return variable declaration statement
  */
-std::unique_ptr<stmt::var> parser::varDeclaration() {
+std::unique_ptr<stmt::let> parser::letDeclaration() {
 	token name = consume(IDENTIFIER, "Expect variable name.");
 
 	std::unique_ptr<expr::expression> initializer;
@@ -387,7 +403,7 @@ std::unique_ptr<stmt::var> parser::varDeclaration() {
 
 	consume(SEMICOLON, "Expect ; after variable declaration.");
 
-	return std::make_unique<stmt::var>(std::move(name), std::move(initializer));
+	return std::make_unique<stmt::let>(std::move(name), std::move(initializer));
 }
 
 
@@ -476,13 +492,20 @@ std::unique_ptr<stmt::class_> parser::classStatement() {
 	consume(LEFT_BRACE, "Expect '{' before class body.");
 
 	std::vector<std::unique_ptr<stmt::function>> methods;
+	std::vector<std::unique_ptr<stmt::let>> variables;
 	while(!check(RIGHT_BRACE) && !isAtEnd()) {
-		methods.push_back(functionStatement("method"));
+		if(match(FN)) {
+			methods.push_back(functionStatement("method"));
+		} else if(match(LET)) {
+			variables.push_back(letDeclaration());
+		} else {
+			throw error(peek(), "Invalid class member.");
+		}
 	}
 
 	consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-	return std::make_unique<stmt::class_>(std::move(name), std::move(methods));
+	return std::make_unique<stmt::class_>(std::move(name), std::move(methods), std::move(variables));
 }
 
 
@@ -529,7 +552,7 @@ std::unique_ptr<stmt::loop> parser::forStatement() {
 
 	std::unique_ptr<stmt::statement> initializer;
 	if(!match(SEMICOLON)) {
-		if(match(LET)) initializer = varDeclaration();
+		if(match(LET)) initializer = letDeclaration();
 		else initializer = expressionStatement();
 	}
 

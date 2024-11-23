@@ -52,15 +52,25 @@ namespace cfp::scan {
 
 
         /*!
-        @brief represent object instance
+        @brief represent instantiation
          */
-        struct instance {
-            explicit instance(const ast::stmt::class_*, std::shared_ptr<interpreting::environment> enclosing);
+        struct constructor {
+            explicit constructor(std::shared_ptr<interpreting::environment> environment, std::string name);
 
             std::string name;
             std::shared_ptr<interpreting::environment> environment;
         };
 
+
+        /*!
+        @brief represent class instance
+         */
+        struct instance {
+            explicit instance(const std::shared_ptr<interpreting::environment>& classEnv, std::string name);
+
+            std::string name;
+            std::shared_ptr<interpreting::environment> environment;
+        };
 
         // simple types
         using boolean = bool;
@@ -82,6 +92,7 @@ namespace cfp::scan {
         explicit literal(types::string val);
         explicit literal(types::boolean val);
         explicit literal(types::callable val);
+        explicit literal(types::constructor val);
         explicit literal(types::instance val);
 
         template<typename T>
@@ -100,6 +111,7 @@ namespace cfp::scan {
         [[nodiscard]] types::decimal getDecimal() const;
         [[nodiscard]] types::string getString() const;
         [[nodiscard]] types::callable getCallable() const;
+        [[nodiscard]] types::constructor getConstructor() const;
         [[nodiscard]] types::instance getInstance() const;
 
         void setBoolean(types::boolean);
@@ -138,6 +150,6 @@ namespace cfp::scan {
         explicit operator bool() const;
         explicit operator std::string() const;
     private:
-        std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string, types::callable, types::instance> value;
+        std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string, types::callable, types::constructor, types::instance> value;
     };
 }

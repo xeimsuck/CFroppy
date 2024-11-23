@@ -1,7 +1,7 @@
 #pragma once
 #include "statement.hpp"
 #include "expression.hpp"
-#include "var.hpp"
+#include "let.hpp"
 #include "block.hpp"
 #include "if_else.hpp"
 #include "loop.hpp"
@@ -22,7 +22,7 @@ namespace cfp::ast::stmt {
 		void visit(statement& stmt);
 
 		virtual void visit(expression& stmt) = 0;
-		virtual void visit(var& stmt) = 0;
+		virtual void visit(let& stmt) = 0;
 		virtual void visit(block& stmt) = 0;
 		virtual void visit(if_else& stmt) = 0;
 		virtual void visit(loop& stmt) = 0;

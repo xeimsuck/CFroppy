@@ -170,6 +170,18 @@ namespace native {
 		if(!vars[1].has<string>()) return scan::literal{};
 		return scan::literal{vars[0].getType()==vars[1].getString()};
 	};
+
+
+	/*!
+	 * @brief return square
+	 */
+	callable::native sqrt = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::sqrt(var.getDecimal()));
+
+		return scan::literal{};
+	};
 }
 
 
@@ -202,6 +214,10 @@ interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env
 	env->define("to_decimal", scan::literal(callable(1, native::to_decimal)));
 	env->define("to_integer", scan::literal(callable(1, native::to_integer)));
 	env->define("to_boolean", scan::literal(callable(1, native::to_boolean)));
+
+	// math
+	env->define("sqrt", scan::literal(callable(1, native::sqrt)));
+
 
 	// other
 	env->define("is_instance", scan::literal(callable(2, native::is_instance)));
@@ -290,8 +306,8 @@ scan::literal interpreter::executeFunction(callable func, const std::vector<scan
  * @param arguments instance arguments
  * @return object
  */
-scan::literal interpreter::executeInstance(instance inst, const std::vector<scan::literal> &arguments) {
-	return scan::literal{};
+scan::literal interpreter::executeInstance(const constructor& inst, const std::vector<scan::literal> &arguments) {
+	return scan::literal(instance(inst.environment, inst.name));
 }
 
 
@@ -413,13 +429,36 @@ scan::literal interpreter::visit(ast::expr::call &expr) {
 		return executeFunction(callee.getCallable(), arguments);
 	}
 
-	if(callee.has<instance>()) {
-		return executeInstance(callee.getInstance(), arguments);
+	if(callee.has<constructor>()) {
+		return executeInstance(callee.getConstructor(), arguments);
 	}
 
 	throw runtime_error("Can only call functions and classes.");
 }
 
+
+/*!
+ * @brief return member
+ */
+scan::literal interpreter::visit(ast::expr::member &expr) {
+	auto super = evaluate(expr.super);
+
+	if(!super.has<instance>()) {
+		throw runtime_error("Variable must be instance of class.");
+	}
+	decltype(auto) inst = super.getInstance();
+
+	const auto mem = dynamic_cast<ast::expr::variable*>(expr.mem.get());
+	if(!mem) {
+		throw runtime_error("Class member must be identifier.");
+	}
+
+	if(!inst.environment->contain(mem->name.lexeme)) {
+		throw runtime_error(std::format("Class '{}' has no member '{}'.", super.getType(), mem->name.lexeme));
+	}
+
+	return inst.environment->get(mem->name.lexeme);
+}
 
 
 
@@ -435,7 +474,7 @@ void interpreter::visit(ast::stmt::expression &stmt) {
 /*!
  * @brief execute variable statement
  */
-void interpreter::visit(ast::stmt::var &stmt) {
+void interpreter::visit(ast::stmt::let &stmt) {
 	env->define(stmt.name.lexeme, evaluate(stmt.initializer));
 }
 
@@ -508,7 +547,17 @@ void interpreter::visit(ast::stmt::return_fn &stmt) {
  * @brief define a class
  */
 void interpreter::visit(ast::stmt::class_ &stmt) {
-	env->define(stmt.name.lexeme, scan::literal(instance(&stmt, env)));
+	auto classEnv = std::make_shared<environment>(env);
+
+	for(decltype(auto) method : stmt.methods) {
+		classEnv->define(method->name.lexeme, scan::literal(callable(method.get(), classEnv)));
+	}
+
+	for(decltype(auto) variable : stmt.variables) {
+		classEnv->define(variable->name.lexeme, evaluate(variable->initializer));
+	}
+
+	env->define(stmt.name.lexeme, scan::literal(constructor(std::move(classEnv), stmt.name.lexeme)));
 }
 
 
