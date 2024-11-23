@@ -94,6 +94,18 @@ void scanner::scanToken() {
         case '/':
             if(match('/')) {
                 while (!isAtEnd() && peek()!='\n') advance();
+            } else if(match('*')) {
+                while (!isAtEnd()) {
+                    if(peek()=='*') {
+                        advance();
+                        if(peek()=='\0') reporter.parse_error(line, "", "Unfinished multi-line comment");
+                        if(peek()=='/') {
+                            advance();
+                            break;
+                        }
+                    } else if(peek()=='\n') ++line;
+                    advance();
+                }
             } else {
                 addToken(match('=') ? SLASH_EQUAL : SLASH);
             }
