@@ -44,13 +44,14 @@ namespace cfp::interpreting {
         void visit(ast::stmt::break_loop &stmt) override;
         void visit(ast::stmt::function &stmt) override;
         void visit(ast::stmt::return_fn &stmt) override;
+        void visit(ast::stmt::class_ &stmt) override;
 
     private:
         void execute(const std::unique_ptr<ast::stmt::statement>& stmt);
         void executeBlock(const std::vector<std::unique_ptr<ast::stmt::statement>>& stmts, std::shared_ptr<environment> env);
         scan::literal executeFunction(scan::types::callable func, const std::vector<scan::literal>& arguments);
 
-        scan::literal evaluate(const std::unique_ptr<ast::expr::expression>& expr);;
+        scan::literal evaluate(const std::unique_ptr<ast::expr::expression>& expr);
 
         const io::reporter& reporter;
         std::shared_ptr<environment> env;

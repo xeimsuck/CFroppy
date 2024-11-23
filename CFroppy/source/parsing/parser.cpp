@@ -402,9 +402,10 @@ std::unique_ptr<stmt::statement> parser::statement() {
 	if(match(WHILE)) return whileStatement();
 	if(match(FOR)) return forStatement();
 	if(match(LOOP)) return loopStatement();
-	if(match(FN)) return function("function");
+	if(match(FN)) return functionStatement("function");
 	if(match(RETURN)) return returnStatement();
 	if(match(BREAK)) return breakStatement();
+	if(match(CLASS)) return classStatement();
     return expressionStatement();
 }
 
@@ -442,7 +443,7 @@ std::unique_ptr<stmt::expression> parser::expressionStatement() {
  * @param kind kind of function (class method or function)
  * @return function statement
  */
-std::unique_ptr<stmt::function> parser::function(const std::string &kind) {
+std::unique_ptr<stmt::function> parser::functionStatement(const std::string &kind) {
 	auto name = consume(IDENTIFIER, std::format("Expect {} name.", kind));
 
 	consume(LEFT_PAREN, std::format("Expect '(' after {} name.", kind));
@@ -463,6 +464,27 @@ std::unique_ptr<stmt::function> parser::function(const std::string &kind) {
 	const auto body = block();
 	return std::make_unique<stmt::function>(std::move(name), std::move(params), std::move(body->statements));
 }
+
+
+/*!
+ * @brief class statement
+ * @return class declaration
+ */
+std::unique_ptr<stmt::class_> parser::classStatement() {
+	auto name = consume(IDENTIFIER,"Expect class name.");
+
+	consume(LEFT_BRACE, "Expect '{' before class body.");
+
+	std::vector<std::unique_ptr<stmt::function>> methods;
+	while(!check(RIGHT_BRACE) && !isAtEnd()) {
+		methods.push_back(functionStatement("method"));
+	}
+
+	consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+	return std::make_unique<stmt::class_>(std::move(name), std::move(methods));
+}
+
 
 
 /*!

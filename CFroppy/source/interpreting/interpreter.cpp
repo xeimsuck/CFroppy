@@ -487,6 +487,14 @@ void interpreter::visit(ast::stmt::return_fn &stmt) {
 }
 
 
+/*!
+ * @brief define a class
+ */
+void interpreter::visit(ast::stmt::class_ &stmt) {
+
+}
+
+
 
 /*!
  * @brief evaluate expression

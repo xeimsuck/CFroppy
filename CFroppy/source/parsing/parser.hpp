@@ -33,7 +33,8 @@ namespace cfp::parse {
         std::unique_ptr<ast::stmt::block> block();
         std::unique_ptr<ast::stmt::statement> statement();
         std::unique_ptr<ast::stmt::expression> expressionStatement();
-        std::unique_ptr<ast::stmt::function> function(const std::string& kind);
+        std::unique_ptr<ast::stmt::function> functionStatement(const std::string& kind);
+        std::unique_ptr<ast::stmt::class_> classStatement();
         std::unique_ptr<ast::stmt::if_else> ifStatement();
         std::unique_ptr<ast::stmt::loop> whileStatement();
         std::unique_ptr<ast::stmt::loop> forStatement();
