@@ -285,6 +285,19 @@ scan::literal interpreter::executeFunction(callable func, const std::vector<scan
 
 
 /*!
+ * @brief execute instance
+ * @param inst
+ * @param arguments instance arguments
+ * @return object
+ */
+scan::literal interpreter::executeInstance(instance inst, const std::vector<scan::literal> &arguments) {
+	return scan::literal{};
+}
+
+
+
+
+/*!
  * @brief evaluate binary expressions
  * @param expr binary expression
  * @return literal
@@ -396,11 +409,15 @@ scan::literal interpreter::visit(ast::expr::call &expr) {
 		arguments.push_back(evaluate(arg));
 	}
 
-	if(!callee.has<callable>()) {
-		throw runtime_error("Can only call functions and classes.");
+	if(callee.has<callable>()) {
+		return executeFunction(callee.getCallable(), arguments);
 	}
 
-	return executeFunction(callee.getCallable(), arguments);
+	if(callee.has<instance>()) {
+		return executeInstance(callee.getInstance(), arguments);
+	}
+
+	throw runtime_error("Can only call functions and classes.");
 }
 
 
@@ -491,7 +508,7 @@ void interpreter::visit(ast::stmt::return_fn &stmt) {
  * @brief define a class
  */
 void interpreter::visit(ast::stmt::class_ &stmt) {
-
+	env->define(stmt.name.lexeme, scan::literal(instance(&stmt, env)));
 }
 
 

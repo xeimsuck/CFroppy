@@ -13,6 +13,7 @@
  */
 
 namespace cfp::ast::stmt {
+    struct class_;
     struct function;
 }
 
@@ -24,6 +25,9 @@ namespace cfp::scan {
     class literal;
 
     namespace types {
+        /*!
+        @brief represent callable type
+         */
         class callable {
         public:
             using native = std::function<literal(const std::vector<literal>&)>;
@@ -46,6 +50,19 @@ namespace cfp::scan {
             std::shared_ptr<interpreting::environment> closure;
         };
 
+
+        /*!
+        @brief represent object instance
+         */
+        struct instance {
+            explicit instance(const ast::stmt::class_*, std::shared_ptr<interpreting::environment> enclosing);
+
+            std::string name;
+            std::shared_ptr<interpreting::environment> environment;
+        };
+
+
+        // simple types
         using boolean = bool;
         using decimal = double;
         using integer = long long;
@@ -65,6 +82,7 @@ namespace cfp::scan {
         explicit literal(types::string val);
         explicit literal(types::boolean val);
         explicit literal(types::callable val);
+        explicit literal(types::instance val);
 
         template<typename T>
         [[nodiscard]] bool has() const {
@@ -82,6 +100,7 @@ namespace cfp::scan {
         [[nodiscard]] types::decimal getDecimal() const;
         [[nodiscard]] types::string getString() const;
         [[nodiscard]] types::callable getCallable() const;
+        [[nodiscard]] types::instance getInstance() const;
 
         void setBoolean(types::boolean);
         void setInteger(types::integer);
@@ -119,6 +138,6 @@ namespace cfp::scan {
         explicit operator bool() const;
         explicit operator std::string() const;
     private:
-        std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string, types::callable> value;
+        std::variant<types::nil, types::boolean, types::integer, types::decimal, types::string, types::callable, types::instance> value;
     };
 }

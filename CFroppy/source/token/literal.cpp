@@ -40,6 +40,17 @@ callable::native callable::getNative() {
 }
 
 
+instance::instance(const ast::stmt::class_* declaration, std::shared_ptr<interpreting::environment> enclosing) {
+    environment = std::make_shared<interpreting::environment>(std::move(enclosing));
+
+    name = declaration->name.lexeme;
+
+    for(decltype(auto) method : declaration->methods) {
+        environment->define(method->name.lexeme, literal(callable(method.get(), environment)));
+    }
+}
+
+
 literal::literal(nil val) : value(val) {
 }
 
@@ -57,6 +68,11 @@ literal::literal(string val) : value(std::move(val)){
 
 literal::literal(callable val) : value(std::move(val)) {
 }
+
+literal::literal(instance val) : value(std::move(val)) {
+}
+
+
 
 
 literal literal::toBoolean() const {
@@ -124,6 +140,10 @@ string literal::getString() const {
 
 callable literal::getCallable() const {
     return std::get<callable>(value);
+}
+
+instance literal::getInstance() const {
+    return std::get<instance>(value);
 }
 
 
