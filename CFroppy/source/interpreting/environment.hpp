@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <map>
 #include "../token/literal.hpp"
 
 /*!
@@ -40,7 +40,7 @@ namespace cfp::interpreting {
 
 	public:
 		scan::literal& consume(const std::string& name);
-		std::unordered_map<std::string, scan::literal> values;
+		std::map<std::string, scan::literal> values;
 		std::shared_ptr<environment> enclosing = nullptr;
 	};
 }
