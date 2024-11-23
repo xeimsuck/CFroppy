@@ -475,6 +475,7 @@ void interpreter::visit(ast::stmt::break_loop &stmt) {
  */
 void interpreter::visit(ast::stmt::function &stmt) {
 	env->define(stmt.name.lexeme, scan::literal(callable(&stmt, env)));
+	env = std::make_shared<environment>(env);
 }
 
 
