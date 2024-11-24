@@ -24,6 +24,10 @@ sudo make install
 # if possible use -j4 with make 
 ```
 
+<div align="center"><h3>How to use</h3></div>
+1. <b>Run prompt.</b> Usage: <i>"cfp"</i>.  <br />
+2. <b>Run file.</b> Usage: <i>"cfp [path-to-file]"</i>.
+
 <div align="center">
 <h1>The Froppy Programming Language</h1>
 Multi-paradigm interpreted programming language
