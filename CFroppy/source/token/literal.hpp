@@ -41,6 +41,7 @@ namespace cfp::scan {
             native getNative();
             [[nodiscard]] ast::stmt::function* getDeclaration() const;
             [[nodiscard]] std::shared_ptr<interpreting::environment> getClosure() const;
+            void setClosure(std::shared_ptr<interpreting::environment>);
             [[nodiscard]] int arity() const;
 
         private:

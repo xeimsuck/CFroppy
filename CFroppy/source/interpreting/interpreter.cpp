@@ -457,7 +457,12 @@ scan::literal interpreter::visit(ast::expr::member &expr) {
 		throw runtime_error(std::format("Class '{}' has no member '{}'.", super.getType(), mem->name.lexeme));
 	}
 
-	return inst.environment->get(mem->name.lexeme);
+	auto value = inst.environment->get(mem->name.lexeme);
+	if(!value.has<callable>() && !value.has<constructor>()) {
+		throw runtime_error(std::format("Class variables must be accessed through getters and setters.", super.getType(), mem->name.lexeme));
+	}
+
+	return value;
 }
 
 

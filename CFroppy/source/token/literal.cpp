@@ -34,6 +34,11 @@ std::shared_ptr<interpreting::environment> callable::getClosure() const {
     return closure;
 }
 
+void callable::setClosure(std::shared_ptr<interpreting::environment> closure) {
+    this->closure = std::move(closure);
+}
+
+
 
 callable::native callable::getNative() {
     return native_;
@@ -47,7 +52,18 @@ constructor::constructor(std::shared_ptr<interpreting::environment> environment,
 
 instance::instance(const std::shared_ptr<interpreting::environment>& classEnv, std::string name) : name(std::move(name)) {
     environment = std::make_shared<interpreting::environment>(classEnv->enclosing);
-    environment->values = classEnv->values;
+
+    for(decltype(auto) value : classEnv->values) {
+        auto [name, literal] = value;
+
+        if(literal.has<callable>()) {
+            auto method = literal.getCallable();
+            method.setClosure(environment);
+            literal = scan::literal(method);
+        }
+
+        environment->define(name, std::move(literal));
+    }
 }
 
 
