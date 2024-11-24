@@ -59,16 +59,25 @@ foo(); // >> "factory::instance"
 Froppy is object-oriented programing language, so it has classes and inheritance.
 
 ```froppy
-class point {
-    let x = 0;
-    let y = 0;
-    fn distance() {
-        return sqrt(x*x+y*y);
+class base { 
+    let x;
+    fn setX(x_) { 
+        x = x_; 
+    }
+    fn getX() { 
+        return x; 
     }
 }
 
-let p = point(15, 20);
-println(p.distance());
+class derived : base { // derived is inherited from base
+    fn setX(x_) {  // override method
+        x=x_*2;
+    }
+}
+
+let d = derived();
+d.setX(3); // use overrided setX method
+printlb(d.getX()); // >> 6
 ```
 
 <div align="center"><h3>Documentation</h3></div>
