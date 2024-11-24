@@ -91,7 +91,7 @@ int cfroppy::executeFile(const std::string &path) {
 int cfroppy::prompt() {
     std::string line="\n";
     while (!line.empty()) {
-        std::cout << "> ";
+        std::cout << ">> ";
         std::getline(std::cin, line);
 
         execute(line);
