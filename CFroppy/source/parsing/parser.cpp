@@ -489,6 +489,13 @@ std::unique_ptr<stmt::function> parser::functionStatement(const std::string &kin
 std::unique_ptr<stmt::class_> parser::classStatement() {
 	auto name = consume(IDENTIFIER,"Expect class name.");
 
+	std::vector<token> bases;
+	if(match(COLON)) {
+		do {
+			bases.push_back(consume(IDENTIFIER, "Expect class name."));
+		} while(match(COMMA));
+	}
+
 	consume(LEFT_BRACE, "Expect '{' before class body.");
 
 	std::vector<std::unique_ptr<stmt::function>> methods;
@@ -505,7 +512,7 @@ std::unique_ptr<stmt::class_> parser::classStatement() {
 
 	consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-	return std::make_unique<stmt::class_>(std::move(name), std::move(methods), std::move(variables));
+	return std::make_unique<stmt::class_>(std::move(name), std::move(bases), std::move(methods), std::move(variables));
 }
 
 

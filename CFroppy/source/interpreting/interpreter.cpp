@@ -554,12 +554,28 @@ void interpreter::visit(ast::stmt::return_fn &stmt) {
 void interpreter::visit(ast::stmt::class_ &stmt) {
 	auto classEnv = std::make_shared<environment>(env);
 
+	for(decltype(auto) base : stmt.bases) {
+		if(!env->exist(base.lexeme)) {
+			throw runtime_error(std::format("Unknown base class '{}'.", base.lexeme));
+		}
+
+		auto baseClass = env->get(base.lexeme);
+		if(!baseClass.has<constructor>()) {
+			throw runtime_error(std::format("'{}' is not a class.", base.lexeme));
+		}
+
+		auto construct = baseClass.getConstructor();
+		for(decltype(auto) member : construct.environment->values) {
+			classEnv->hard_define(member.first, member.second);
+		}
+	}
+
 	for(decltype(auto) method : stmt.methods) {
-		classEnv->define(method->name.lexeme, scan::literal(callable(method.get(), classEnv)));
+		classEnv->hard_define(method->name.lexeme, scan::literal(callable(method.get(), classEnv)));
 	}
 
 	for(decltype(auto) variable : stmt.variables) {
-		classEnv->define(variable->name.lexeme, evaluate(variable->initializer));
+		classEnv->hard_define(variable->name.lexeme, evaluate(variable->initializer));
 	}
 
 	env->define(stmt.name.lexeme, scan::literal(constructor(std::move(classEnv), stmt.name.lexeme)));

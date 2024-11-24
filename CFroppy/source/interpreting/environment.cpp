@@ -50,6 +50,17 @@ void environment::define(const std::string &name, scan::literal value) {
 
 
 /*!
+ * @brief defines new variable even it already exists
+ * @param name
+ * @param value
+ */
+void environment::hard_define(const std::string &name, scan::literal value) {
+	values[name] = std::move(value);
+}
+
+
+
+/*!
  * @brief undefine variable
  * @param name variable name
  */
@@ -81,6 +92,11 @@ scan::literal environment::get(const std::string &name) {
 
 bool environment::contain(const std::string &name) const {
 	return values.contains(name);
+}
+
+bool environment::exist(const std::string &name) const {
+	if(contain(name)) return true;
+	return enclosing ? enclosing->exist(name) : false;
 }
 
 

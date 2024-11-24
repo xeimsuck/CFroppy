@@ -69,6 +69,7 @@ void scanner::scanToken() {
         case '}': addToken(RIGHT_BRACE); break;
         case ',': addToken(COMMA); break;
         case '.': addToken(DOT); break;
+        case ':': addToken(COLON); break;
         case '-':
             addToken(match('=') ? MINUS_EQUAL : MINUS);
             break;
