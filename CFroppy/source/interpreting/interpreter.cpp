@@ -182,6 +182,142 @@ namespace native {
 
 		return scan::literal{};
 	};
+
+	/*!
+	 * @brief return cosine
+	 */
+	callable::native cos = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::cos(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief return sinus
+	 */
+	callable::native sin = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::sin(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief return tangent
+	 */
+	callable::native tan = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::tan(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief return arc cosine
+	 */
+	callable::native acos = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::acos(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief return arc sinus
+	 */
+	callable::native asin = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::asin(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief return arc tangent
+	 */
+	callable::native atan = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::atan(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief raises a number to the given powe
+	 */
+	callable::native pow = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+		const auto power = vars[1].toDecimal();
+
+		if(var.has<decimal>() && power.has<decimal>()) return scan::literal(std::pow(var.getDecimal(), power.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief Compute absolute value
+	 */
+	callable::native abs = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::abs(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief Computes the natural (base e) logarithm
+	 */
+	callable::native log = [](const std::vector<scan::literal>& vars) {
+		const auto var = vars[0].toDecimal();
+
+		if(var.has<decimal>()) return scan::literal(std::log(var.getDecimal()));
+
+		return scan::literal{};
+	};
+
+	/*!
+	 * @brief Find maximum value
+	 */
+	callable::native max = [](const std::vector<scan::literal>& vars) {
+		bool exist = false;
+		decimal max = LONG_LONG_MIN;
+
+		for(decltype(auto) var : vars) {
+			auto dec = var.toDecimal();
+			if(dec.has<decimal>()) {
+				exist = true;
+				max = std::max(max, dec.getDecimal());
+			}
+		}
+
+		return exist ? scan::literal{max} : scan::literal{};
+	};
+
+	/*!
+	 * @brief Find maximum value
+	 */
+	callable::native min = [](const std::vector<scan::literal>& vars) {
+		bool exist = false;
+		decimal min = LONG_LONG_MAX;
+
+		for(decltype(auto) var : vars) {
+			auto dec = var.toDecimal();
+			if(dec.has<decimal>()) {
+				exist = true;
+				min = std::min(min, dec.getDecimal());
+			}
+		}
+
+		return exist ? scan::literal{min} : scan::literal{};
+	};
 }
 
 
@@ -217,6 +353,17 @@ interpreter::interpreter(const io::reporter& reporter) : reporter(reporter), env
 
 	// math
 	env->define("sqrt", scan::literal(callable(1, native::sqrt)));
+	env->define("cos", scan::literal(callable(1, native::cos)));
+	env->define("sin", scan::literal(callable(1, native::sin)));
+	env->define("tan", scan::literal(callable(1, native::tan)));
+	env->define("acos", scan::literal(callable(1, native::acos)));
+	env->define("asin", scan::literal(callable(1, native::asin)));
+	env->define("atan", scan::literal(callable(1, native::atan)));
+	env->define("pow", scan::literal(callable(2, native::pow)));
+	env->define("abs", scan::literal(callable(1, native::abs)));
+	env->define("log", scan::literal(callable(1, native::log)));
+	env->define("max", scan::literal(callable(callable::variadic_arity, native::max)));
+	env->define("min", scan::literal(callable(callable::variadic_arity, native::min)));
 
 
 	// other
