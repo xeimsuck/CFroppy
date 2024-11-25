@@ -1,6 +1,6 @@
 <div align="center">
 <h1>CFroppy</h1>
-Compiler for <b>Froppy</b> programming language
+Interpreter for <b>Froppy</b> programming language
 </div>
 
 
